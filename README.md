@@ -35,7 +35,7 @@ For more information on contributing, please read our Contribution Guide.
 
 ## License
 
-**micopy** is licensed under the MIT License.
+**micopy** is licensed under the [MIT License](https://github.com/anmalkov/micopy/blob/main/LICENSE).
 
 ## Community
 
