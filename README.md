@@ -1,14 +1,44 @@
-# micopy
+# micopy: Your Ultimate Directory Management Powerhouse
 
-Are you tired of manually copying and syncing files between directories? Have you ever struggled with complex scripts or inconsistent results when synchronizing folders? Worry no more - **micopy** is here to revolutionize the way you manage your files.
+micopy is a powerful and efficient CLI tool designed to simplify the process of copying and synchronizing files between directories. Whether you're a developer synchronizing source code, a creator organizing your massive photo or video library, or a business owner managing critical documents, micopy is your go-to tool for easy and efficient file synchronization. Leveraging the versatile .NET platform, micopy offers blazing-fast file transfers, customizable ignore patterns, real-time progress indicators, and intelligent copy control across multiple operating systems.
 
-## Key Features:
+## Key Features
 
-- 🚀 Blazing Fast File Transfer: Experience top-notch performance with FolderSync's built-in parallelism support, making file transfers faster and more efficient than ever before.
-- 🎯 Customizable Ignore Patterns: Leverage the power of YAML configuration and .gitignore-like patterns to selectively copy files, giving you unparalleled control over your folder syncing process.
-- 📊 Real-time Progress Indicator: Stay informed throughout the entire transfer process with a visually appealing progress bar that keeps you updated on the percentage of files copied.
-- 🧠 Intelligent Copy Control: Specify the degree of parallelism you need, from simple sequential copying to multithreaded transfers, FolderSync adapts to your requirements.
-- 🌐 Cross-platform Compatibility: Built on the versatile .NET platform, FolderSync is designed to work seamlessly across multiple operating systems.
-FolderSync is the comprehensive solution for all your file management needs. Whether you're a developer synchronizing source code, a photographer organizing your massive photo library, or a business owner managing critical documents, FolderSync is your go-to tool for easy and efficient file synchronization.
+- Blazing Fast File Transfer: Built-in parallelism support for fast and efficient file transfers.
+- Customizable Ignore Patterns: Selectively copy files using YAML configuration and .gitignore-like patterns.
+- Real-time Progress Indicator: Stay informed with a visually appealing progress bar.
+- Intelligent Copy Control: Specify the degree of parallelism, from sequential copying to multithreaded transfers.
+- Cross-platform Compatibility: Seamlessly works across multiple operating systems thanks to the .NET platform.
 
-Say goodbye to tedious, manual copying and scripting nightmares. Let **micopy** take the wheel and enjoy the perfect balance of speed, flexibility, and ease-of-use. Discover the future of folder synchronization - try **micopy** today!
+## Installation and Usage
+
+To use micopy, follow the instructions in the Getting Started section.
+
+## Getting Started
+
+1. Clone this repository to your local machine.
+1. Build the solution using the .NET CLI or Visual Studio.
+1. Run the console application with the appropriate command-line arguments and options.
+1. Enjoy effortless and efficient folder synchronization!
+1. For more detailed information, please refer to our Wiki and FAQ pages.
+
+## Contributing
+
+micopy is an open-source project, and we encourage contributions from developers like you! We appreciate any bug reports, feature suggestions, code improvements, or even documentation updates. To contribute, please follow these steps:
+
+1. Fork the repository.
+1. Create a new branch for your changes.
+1. Commit your changes to the new branch.
+1. Submit a pull request to the main repository.
+
+For more information on contributing, please read our Contribution Guide.
+
+## License
+
+micopy is licensed under the MIT License.
+
+## Community
+
+We are excited to have you join our growing community of micopy users and contributors! For any questions, suggestions, or discussions, please visit our GitHub Discussions page.
+
+Together, we can make micopy the ultimate directory management tool for developers, photographers, business owners, and everyone in between. Let's build the future of folder synchronization!
