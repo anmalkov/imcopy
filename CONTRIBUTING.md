@@ -4,13 +4,13 @@ Thank you for your interest in contributing to micopy! We appreciate your time a
 
 ## Table of Contents
 
-[Code of Conduct](#code-of-conduct)
-[Setting Up Your Environment](#setting-up-your-environment)
-[Submitting a Bug Report](#Submitting-a-Bug-Report)
-[Requesting a Feature](#Requesting-a-Feature)
-[Contributing Code](#Contributing-Code)
-[Documentation and Localization](#Documentation-and-Localization)
-[Support and Community](#Support-and-Community)
+- [Code of Conduct](#code-of-conduct)
+- [Setting Up Your Environment](#setting-up-your-environment)
+- [Submitting a Bug Report](#Submitting-a-Bug-Report)
+- [Requesting a Feature](#Requesting-a-Feature)
+- [Contributing Code](#Contributing-Code)
+- [Documentation and Localization](#Documentation-and-Localization)
+- [Support and Community](#Support-and-Community)
 
 ## Code of Conduct
 
