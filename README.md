@@ -12,7 +12,7 @@
 
 ## Installation and Usage
 
-To use **micopy**, follow the instructions in the Getting Started section.
+To use **micopy**, follow the instructions in the [Getting Started](#getting-started) section.
 
 ## Getting Started
 
