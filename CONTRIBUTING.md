@@ -56,7 +56,7 @@ If you're ready to contribute code to micopy, please follow these steps:
 
 We value clear and comprehensive documentation, as well as localization to make micopy accessible to users worldwide. If you can help improve our documentation or contribute translations, please create a pull request with your changes.
 
-# Support and Community
+## Support and Community
 
 If you have any questions, suggestions, or need support, feel free to visit our [GitHub Discussions](https://github.com/anmalkov/micopy/discussions) page.
 
