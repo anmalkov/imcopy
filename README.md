@@ -31,7 +31,7 @@ To use **micopy**, follow the instructions in the [Getting Started](#getting-sta
 1. Commit your changes to the new branch.
 1. Submit a pull request to the main repository.
 
-For more information on contributing, please read our Contribution Guide.
+For more information on contributing, please read our [Contribution Guide](CONTRIBUTIONG.md).
 
 ## License
 
