@@ -39,6 +39,6 @@ For more information on contributing, please read our Contribution Guide.
 
 ## Community
 
-We are excited to have you join our growing community of **micopy** users and contributors! For any questions, suggestions, or discussions, please visit our GitHub Discussions page.
+We are excited to have you join our growing community of **micopy** users and contributors! For any questions, suggestions, or discussions, please visit our [GitHub Discussions page](https://github.com/anmalkov/micopy/discussions).
 
 Together, we can make **micopy** the ultimate directory management tool for developers, photographers, business owners, and everyone in between. Let's build the future of folder synchronization!
