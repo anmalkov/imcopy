@@ -1,6 +1,6 @@
 # micopy: Your Ultimate Directory Management Powerhouse
 
-micopy is a powerful and efficient CLI tool designed to simplify the process of copying and synchronizing files between directories. Whether you're a developer synchronizing source code, a creator organizing your massive photo or video library, or a business owner managing critical documents, micopy is your go-to tool for easy and efficient file synchronization. Leveraging the versatile .NET platform, micopy offers blazing-fast file transfers, customizable ignore patterns, real-time progress indicators, and intelligent copy control across multiple operating systems.
+**micopy** is a powerful and efficient CLI tool designed to simplify the process of copying and synchronizing files between directories. Whether you're a developer synchronizing source code, a creator organizing your massive photo or video library, or a business owner managing critical documents, **micopy** is your go-to tool for easy and efficient file synchronization. Leveraging the versatile .NET platform, **micopy** offers blazing-fast file transfers, customizable ignore patterns, real-time progress indicators, and intelligent copy control across multiple operating systems.
 
 ## Key Features
 
@@ -12,7 +12,7 @@ micopy is a powerful and efficient CLI tool designed to simplify the process of 
 
 ## Installation and Usage
 
-To use micopy, follow the instructions in the Getting Started section.
+To use **micopy**, follow the instructions in the Getting Started section.
 
 ## Getting Started
 
@@ -24,7 +24,7 @@ To use micopy, follow the instructions in the Getting Started section.
 
 ## Contributing
 
-micopy is an open-source project, and we encourage contributions from developers like you! We appreciate any bug reports, feature suggestions, code improvements, or even documentation updates. To contribute, please follow these steps:
+**micopy** is an open-source project, and we encourage contributions from developers like you! We appreciate any bug reports, feature suggestions, code improvements, or even documentation updates. To contribute, please follow these steps:
 
 1. Fork the repository.
 1. Create a new branch for your changes.
@@ -35,10 +35,10 @@ For more information on contributing, please read our Contribution Guide.
 
 ## License
 
-micopy is licensed under the MIT License.
+**micopy** is licensed under the MIT License.
 
 ## Community
 
-We are excited to have you join our growing community of micopy users and contributors! For any questions, suggestions, or discussions, please visit our GitHub Discussions page.
+We are excited to have you join our growing community of **micopy** users and contributors! For any questions, suggestions, or discussions, please visit our GitHub Discussions page.
 
-Together, we can make micopy the ultimate directory management tool for developers, photographers, business owners, and everyone in between. Let's build the future of folder synchronization!
+Together, we can make **micopy** the ultimate directory management tool for developers, photographers, business owners, and everyone in between. Let's build the future of folder synchronization!
