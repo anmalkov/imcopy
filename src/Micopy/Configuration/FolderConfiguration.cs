@@ -1,6 +1,6 @@
 ﻿namespace Micopy.Configuration;
 
-internal record FolderConfiguration(
+public record FolderConfiguration(
     string Source,
     string Destination,
     string? IgnorePatternName

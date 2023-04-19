@@ -1,92 +1,17 @@
-﻿using Micopy.Configuration;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using Microsoft.Extensions.FileSystemGlobbing;
-using System.CommandLine;
-using System.Diagnostics;
+﻿using System.CommandLine;
 
 namespace Micopy.Services;
 
-public record FileConfiguration(
-    string FileName,
-    string SourceFolder,
-    string DestinationFolder
-);
-
-public class CopyService
+public class CopyServiceOld
 {
     private const int DefaultParallelism = 8;
 
     private readonly IConsole console;
 
-    public CopyService(IConsole console)
+    public CopyServiceOld(IConsole console)
     {
         this.console = console;
     }
-
-    public void Copy(MicopyConfiguration configuration)
-    {
-        if (configuration.Parallelism.HasValue && configuration.Parallelism.Value == 0)
-        {
-            CopyDirectories(configuration.Folders, configuration.IgnorePatterns);
-            return;
-        }
-
-        var parallelism = configuration.Parallelism.HasValue ? configuration.Parallelism.Value : DefaultParallelism;
-    }
-
-    private void CopyDirectories(IEnumerable<FolderConfiguration> folders, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
-    {
-        var files = new Stack<FileConfiguration>();
-        foreach (var folder in folders)
-        {
-            var matcher = new Matcher();
-            matcher.AddInclude("**/*");  //**
-            if (!string.IsNullOrEmpty(folder.IgnorePatternName) && ignorePatterns is not null)
-            {
-                var ignorePattern = ignorePatterns.First(p => p.Name.Equals(folder.IgnorePatternName, StringComparison.OrdinalIgnoreCase));
-                foreach (var pattern in ignorePattern.Patterns)
-                {
-                    matcher.AddExclude(pattern);
-                }
-            }
-
-            var dirInfo = new DirectoryInfo(folder.Source);
-            var directoryWrapper = new DirectoryInfoWrapper(dirInfo);
-            var result = matcher.Execute(directoryWrapper);
-
-            var foundFiles = result.Files.Select(file => {
-                var relativeFolder = Path.GetDirectoryName(file.Path);
-                var sourceFolder = Path.Combine(folder.Source, relativeFolder);
-                var destinationFolder = Path.Combine(folder.Destination, relativeFolder);
-                var fileName = Path.GetFileName(file.Path);
-                return new FileConfiguration(fileName, sourceFolder, destinationFolder);
-            });
-
-            foreach (var file in foundFiles)
-            {
-                files.Push(file);
-            }
-        }
-
-        var filesCount = files.Count;
-        var filesCopied = 0;
-        var stopwatch = Stopwatch.StartNew();
-        while (files.Count > 0)
-        {
-            var file = files.Pop();
-            if (!Directory.Exists(file.DestinationFolder))
-            {
-                Directory.CreateDirectory(file.DestinationFolder);
-            }
-            File.Copy(Path.Combine(file.SourceFolder, file.FileName), Path.Combine(file.DestinationFolder, file.FileName), overwrite: true);
-            filesCopied++;
-            DisplayProgressBar(filesCopied, filesCount);
-        }
-        stopwatch.Stop();
-        console.WriteLine($"{Environment.NewLine}{filesCount} files copied in {stopwatch.Elapsed}");
-    }
-
-
 
     public async Task CopyDirectoryAsync(string sourceFolder, string destinationFolder, int? parallelism)
     {

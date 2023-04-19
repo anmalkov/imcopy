@@ -1,7 +1,7 @@
 ﻿namespace Micopy.Configuration;
 
-internal record MicopyConfiguration(
+public record MicopyConfiguration(
     IEnumerable<FolderConfiguration> Folders,
     IEnumerable<IgnorePatternConfiguration>? IgnorePatterns,
-    int? Parallel = 8
+    int? Parallelism
 );

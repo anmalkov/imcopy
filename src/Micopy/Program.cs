@@ -1,4 +1,5 @@
-﻿using Micopy.Services;
+﻿using Micopy.Configuration;
+using Micopy.Services;
 using System.CommandLine;
 using System.CommandLine.IO;
 
@@ -33,7 +34,11 @@ rootCommand.SetHandler(async context =>
 
     if (string.IsNullOrEmpty(configFile))
     {
-        copyService.CopyDirectory(source!, destination!, parallel);
+        copyService.Copy(new MicopyConfiguration(
+            new[] { new FolderConfiguration(source!, destination!, null) },
+            null,
+            parallel
+        ));
         context.ExitCode = 0;
         return;
     }

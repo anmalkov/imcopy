@@ -1,6 +1,6 @@
 ﻿namespace Micopy.Configuration;
 
-internal record IgnorePatternConfiguration(
+public record IgnorePatternConfiguration(
     string Name, 
     IEnumerable<string> Patterns
 );
