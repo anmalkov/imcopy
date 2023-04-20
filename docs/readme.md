@@ -16,7 +16,7 @@ This option allows you to copy all of the files from a source folder to a destin
   micopy --source /home/user/data --destination /home/user/archive/data
   ```
 
-1. Simple Windows command  
+2. Simple Windows command  
   This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use default parallelism.  
   ```bash
   micopy --source C:\Users\user\data --destination C:\Users\user\archive\data
