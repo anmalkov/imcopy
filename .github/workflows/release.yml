@@ -58,5 +58,6 @@ jobs:
         zip -r publish/linux-x64.zip publish/linux-x64
         zip -r publish/linux-arm.zip publish/linux-arm
         ls
+      working-directory: src/Micopy
 
 
