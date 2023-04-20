@@ -15,7 +15,7 @@ public record FileItem(
 
 public class CopyService
 {
-    private const int DefaultParallelism = 8;
+    public const int DefaultParallelism = 8;
 
     private readonly IConsole console;
 

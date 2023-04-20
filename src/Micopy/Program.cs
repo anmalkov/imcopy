@@ -3,10 +3,10 @@ using Micopy.Services;
 using System.CommandLine;
 using System.CommandLine.IO;
 
-var configFileOption = new Option<string?>(new[] { "--config", "-c" }, () => null, "Path to the YAML configuration file.");
+var configFileOption = new Option<string?>(new[] { "--file", "-f" }, () => null, "Path to the YAML configuration file.");
 var sourceOption = new Option<string?>(new[] { "--source", "-s" }, () => null, "Source directory path.");
 var destinationOption = new Option<string?>(new[] { "--destination", "-d" }, () => null, "Destination directory path.");
-var parallelOption = new Option<int?>(new[] { "--parallel", "-p" }, () => null, "Degree of parallelism. Leave empty for default, specify an integer for custom parallelism.");
+var parallelOption = new Option<int?>(new[] { "--parallel", "-p" }, () => null, $"Degree of parallelism. If option is not specified or left empty, the default value ({CopyService.DefaultParallelism}) will be used. Specify an integer for custom parallelism.");
 
 var rootCommand = new RootCommand("A powerful tool for copying and synchronizing directories.")
 {
