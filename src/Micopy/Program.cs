@@ -32,25 +32,28 @@ rootCommand.SetHandler(async context =>
 
     var copyService = new CopyService(context.Console);
 
+    MicopyConfiguration configuration;
     if (string.IsNullOrEmpty(configFile))
     {
-        copyService.Copy(new MicopyConfiguration(
+        configuration = new MicopyConfiguration(
             new[] { new FolderConfiguration(source!, destination!, null) },
             null,
             parallel
-        ));
-        context.ExitCode = 0;
-        return;
+        );
     }
-
-    var (configuration, error) = await ConfigurationService.LoadAsync(configFile);
-    if (error is not null)
+    else
     {
-        context.Console.WriteLine($"ERROR: {configFile} file format is incorrect.{Environment.NewLine}\t{error}");
-        context.ExitCode = 1;
-        return;
+        var loadResult = await ConfigurationService.LoadAsync(configFile);
+        if (loadResult.Exception is not null)
+        {
+            context.Console.WriteLine($"ERROR: {configFile} file format is incorrect.{Environment.NewLine}\t{loadResult.Exception}");
+            context.ExitCode = 1;
+            return;
+        }
+        configuration = loadResult.Configuration!;
     }
 
+    copyService.Copy(configuration);
     context.ExitCode = 0;
 });
 

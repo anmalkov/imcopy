@@ -87,7 +87,7 @@ public class CopyService
             var result = matcher.Execute(directoryWrapper);
 
             var directoryFiles = result.Files.Select(file => {
-                var relativeFolder = Path.GetDirectoryName(file.Path);
+                var relativeFolder = Path.GetDirectoryName(file.Path) ?? "";
                 var sourceFolder = Path.Combine(folder.Source, relativeFolder);
                 var destinationFolder = Path.Combine(folder.Destination, relativeFolder);
                 var fileName = Path.GetFileName(file.Path);
