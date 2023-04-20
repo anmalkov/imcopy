@@ -8,7 +8,7 @@ var sourceOption = new Option<string?>(new[] { "--source", "-s" }, () => null, "
 var destinationOption = new Option<string?>(new[] { "--destination", "-d" }, () => null, "Destination directory path.");
 var parallelOption = new Option<int?>(new[] { "--parallel", "-p" }, () => null, $"Degree of parallelism. If option is not specified or left empty, the default value ({CopyService.DefaultParallelism}) will be used. Specify an integer for custom parallelism.");
 
-var rootCommand = new RootCommand("A powerful tool for copying and synchronizing directories.")
+var rootCommand = new RootCommand("A powerful and efficient CLI tool designed to simplify the process of copying and synchronizing files between directories")
 {
     configFileOption,
     sourceOption,
