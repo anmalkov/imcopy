@@ -1,3 +1,19 @@
+# micopy docs
+
+## How to use
+
+There are two ways how to use micopy.
+
+### Simple option
+
+This option allows you to copy one source folder to a destination folder.
+
+### Advance option
+
+This option allows you to 
+
+
+
 ## Ignore patterns
 
 ### Patterns
