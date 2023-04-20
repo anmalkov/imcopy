@@ -65,41 +65,16 @@ jobs:
       working-directory: src/Micopy
 
     - name: Create GitHub Release
-      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+      run: |
+        TAG_NAME=$(echo $GITHUB_REF | cut -d '/' -f 3)
+        gh release create "$TAG_NAME" --title "Release $TAG_NAME"        
 
-    - name: Upload Windows asset
-      uses: actions/upload-release-asset@v1
+    - name: Upload Release Assets
+      run: |
+        TAG_NAME=$(echo $GITHUB_REF | cut -d '/' -f 3)
+        gh release upload "$TAG_NAME" win-x64.zip linux-x64.zip linux-arm.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: src/Micopy/publish/win-x64.zip
-        asset_name: micopy-win-x64.zip
-        asset_content_type: application/zip
-
-    - name: Upload Linux asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: src/Micopy/publish/linux-x64.zip
-        asset_name: micopy-linux-x64.zip
-        asset_content_type: application/zip
-
-    - name: Upload ARM asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: src/Micopy/publish/linux-arm.zip
-        asset_name: micopy-linux-arm.zip
-        asset_content_type: application/zip
+      working-directory: src/Micopy/publish
