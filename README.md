@@ -20,8 +20,7 @@ To use **micopy**, follow the instructions in the [Getting Started](#getting-sta
 
 1. Go to [Release page](https://github.com/anmalkov/micopy/releases/tag/v1.0.0)
 1. Choose a zip archive based on your architecture
-1. Download zip archive
-1. Extract zip archive
+1. Download and extract a zip archive
 1. Enjoy effortless and efficient folder synchronization!
 1. For more detailed information, please refer to our Wiki and FAQ pages.
 
