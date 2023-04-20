@@ -58,9 +58,9 @@ jobs:
     - name: Zip publish folders
       run: |
         sudo apt-get install zip
-        zip -r publish/win-x64.zip publish/win-x64
-        zip -r publish/linux-x64.zip publish/linux-x64
-        zip -r publish/linux-arm.zip publish/linux-arm
+        zip -r -j publish/win-x64.zip publish/win-x64
+        zip -r -j publish/linux-x64.zip publish/linux-x64
+        zip -r -j publish/linux-arm.zip publish/linux-arm
         ls publish
       working-directory: src/Micopy
 
