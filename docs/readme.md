@@ -10,17 +10,17 @@ This option allows you to copy all of the files from a source folder to a destin
 
 #### Examples
 
-1. Simple Linux command
+1. Simple Linux command  
+  This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism.  
   ```bash
   micopy --source /home/user/data --destination /home/user/archive/data
-  ```  
-  This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism.
+  ```
 
 1. Simple Windows command  
+  This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use default parallelism.  
   ```bash
   micopy --source C:\Users\user\data --destination C:\Users\user\archive\data
-  ```  
-  This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use default parallelism.
+  ```
 
 ### Advance option
 
