@@ -7,7 +7,7 @@
 - Character range [a-z]: Matches any single character within the specified range. For example, file[a-c].txt matches filea.txt, fileb.txt, and filec.txt.
 - Recursive wildcard **: Matches any sequence of directories. For example, **/*.jpg matches all .jpg files in any directory level.
 
-Here are some examples of patterns you can use in the appsettings.yaml file:
+Here are some examples of patterns you can use in the micopy comfiguration file (micopy.yaml):
 
 ```yaml
 ignorePatterns:
