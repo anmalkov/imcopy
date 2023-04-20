@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   build_and_release:
@@ -28,6 +29,7 @@ jobs:
         project_path="src/Micopy/Micopy.csproj"
         sed -i "s/<AssemblyVersion>[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*<\/AssemblyVersion>/<AssemblyVersion>${assembly_version}<\/AssemblyVersion>/g" $project_path
         sed -i "s/<FileVersion>[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*<\/FileVersion>/<FileVersion>${file_version}<\/FileVersion>/g" $project_path
+        cat $project_path
 
     - name: Restore dependencies
       run: dotnet restore
