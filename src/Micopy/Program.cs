@@ -53,7 +53,7 @@ rootCommand.SetHandler(async context =>
         configuration = loadResult.Configuration!;
     }
 
-    copyService.Copy(configuration);
+    await copyService.CopyAsync(configuration);
     context.ExitCode = 0;
 });
 

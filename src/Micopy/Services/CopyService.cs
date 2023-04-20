@@ -3,6 +3,7 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using Microsoft.Extensions.FileSystemGlobbing;
 using System.CommandLine;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 namespace Micopy.Services;
 
@@ -23,15 +24,59 @@ public class CopyService
         this.console = console;
     }
 
-    public void Copy(MicopyConfiguration configuration)
+    public async Task CopyAsync(MicopyConfiguration configuration)
     {
-        if (configuration.Parallelism.HasValue && configuration.Parallelism.Value == 0)
+        if (configuration.Parallelism.HasValue && (configuration.Parallelism.Value == 0 || configuration.Parallelism.Value == 1))
         {
             CopyDirectories(configuration.Folders, configuration.IgnorePatterns);
             return;
         }
 
+        await CopyDirectoriesAsync(configuration);
+    }
+
+    private async Task CopyDirectoriesAsync(MicopyConfiguration configuration)
+    {
+        var foundFiles = GetFiles(configuration.Folders, configuration.IgnorePatterns);
+        var files = new ConcurrentStack<FileItem>(foundFiles);
+
+        var filesCount = files.Count;
+        var filesCopied = 0;
+
         var parallelism = configuration.Parallelism.HasValue ? configuration.Parallelism.Value : DefaultParallelism;
+        using var concurrencySemaphore = new SemaphoreSlim(parallelism);
+
+        var lockObject = new object();
+        var tasks = new List<Task>(filesCount);
+
+        var stopwatch = Stopwatch.StartNew();
+        while (!files.IsEmpty)
+        {
+            await concurrencySemaphore.WaitAsync();
+            tasks.Add(Task.Run(() =>
+            {
+                try
+                {
+                    if (files.TryPop(out var file))
+                    {
+                        CopyFile(file);
+                        var newFilesCopied = Interlocked.Increment(ref filesCopied);
+                        lock (lockObject)
+                        {
+                            DisplayProgressBar(newFilesCopied, filesCount);
+                        }
+                    }
+                }
+                finally
+                {
+                    concurrencySemaphore.Release();
+                }
+            }));
+        }
+        await Task.WhenAll(tasks);
+        stopwatch.Stop();
+
+        DisplaySummary(filesCount, stopwatch);
     }
 
     private void CopyDirectories(IEnumerable<FolderConfiguration> folders, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
@@ -46,21 +91,22 @@ public class CopyService
         while (files.Count > 0)
         {
             var file = files.Pop();
-            if (!Directory.Exists(file.DestinationFolder))
-            {
-                Directory.CreateDirectory(file.DestinationFolder);
-            }
             CopyFile(file);
             filesCopied++;
             DisplayProgressBar(filesCopied, filesCount);
         }
         stopwatch.Stop();
 
-        console.WriteLine($"{Environment.NewLine}{filesCount} files copied in {stopwatch.Elapsed}");
+        DisplaySummary(filesCount, stopwatch);
     }
 
     private static void CopyFile(FileItem file)
     {
+        if (!Directory.Exists(file.DestinationFolder))
+        {
+            Directory.CreateDirectory(file.DestinationFolder);
+        }
+
         var sourceFile = Path.Combine(file.SourceFolder, file.FileName);
         var destinationFile = Path.Combine(file.DestinationFolder, file.FileName);
         File.Copy(sourceFile, destinationFile, overwrite: true);
@@ -110,5 +156,9 @@ public class CopyService
         console.Write(new string('#', filledBars));
         console.Write(new string(' ', emptyBars));
         console.Write($"] {progressFraction:P0}");
+    }
+    private void DisplaySummary(int filesCount, Stopwatch stopwatch)
+    {
+        console.WriteLine($"{Environment.NewLine}{filesCount} files copied in {stopwatch.Elapsed}");
     }
 }
