@@ -9,7 +9,7 @@ internal static class ConfigurationService
     public static async Task<(MicopyConfiguration? Configuration, Exception? Exception)> LoadAsync(string path)
     {
         var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(UnderscoredNamingConvention.Instance)
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
 
         using var reader = new StreamReader(path);

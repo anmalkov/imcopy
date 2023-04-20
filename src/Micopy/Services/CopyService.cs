@@ -1,9 +1,8 @@
 ﻿using Micopy.Configuration;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using Microsoft.Extensions.FileSystemGlobbing;
 using System.CommandLine;
 using System.Diagnostics;
 using System.Collections.Concurrent;
+using DotNet.Globbing;
 
 namespace Micopy.Services;
 
@@ -117,26 +116,33 @@ public class CopyService
         var files = new List<FileItem>();
         foreach (var folder in folders)
         {
-            var matcher = new Matcher();
-            matcher.AddInclude("**/*");  //**
+            var excludeGlobs = new List<Glob>();
             if (!string.IsNullOrEmpty(folder.IgnorePatternName) && ignorePatterns is not null)
             {
                 var ignorePattern = ignorePatterns.First(p => p.Name.Equals(folder.IgnorePatternName, StringComparison.OrdinalIgnoreCase));
                 foreach (var pattern in ignorePattern.Patterns)
                 {
-                    matcher.AddExclude(pattern);
+                    excludeGlobs.Add(Glob.Parse(pattern));
                 }
             }
 
             var dirInfo = new DirectoryInfo(folder.Source);
-            var directoryWrapper = new DirectoryInfoWrapper(dirInfo);
-            var result = matcher.Execute(directoryWrapper);
+            var fileInfos = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories);
 
-            var directoryFiles = result.Files.Select(file => {
-                var relativeFolder = Path.GetDirectoryName(file.Path) ?? "";
-                var sourceFolder = Path.Combine(folder.Source, relativeFolder);
-                var destinationFolder = Path.Combine(folder.Destination, relativeFolder);
-                var fileName = Path.GetFileName(file.Path);
+            var directoryFiles = fileInfos.Where(f => !excludeGlobs.Any(g => g.IsMatch(f.FullName)))
+                .Select(f => {
+                    var relativeFolder = Path.GetDirectoryName(f.FullName) ?? "";
+                    if (!string.IsNullOrEmpty(relativeFolder))
+                    {
+                        relativeFolder = relativeFolder[folder.Source.Length..];
+                        if (relativeFolder.StartsWith(Path.DirectorySeparatorChar) || relativeFolder.StartsWith(Path.AltDirectorySeparatorChar))
+                        {
+                            relativeFolder = relativeFolder[1..];
+                        }
+                    }
+                    var sourceFolder = Path.Combine(folder.Source, relativeFolder);
+                    var destinationFolder = Path.Combine(folder.Destination, relativeFolder);
+                    var fileName = f.Name;
                 return new FileItem(fileName, sourceFolder, destinationFolder);
             });
 

@@ -2,7 +2,7 @@
   "profiles": {
     "Micopy": {
       "commandName": "Project",
-      "commandLineArgs": "--source D:\\Apps\\My\\micopy\\src --destination D:\\Apps\\Temp\\micopy --parallel 0"
+      "commandLineArgs": "--file micopy.yaml"
     }
   }
 }

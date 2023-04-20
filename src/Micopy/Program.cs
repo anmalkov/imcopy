@@ -35,11 +35,11 @@ rootCommand.SetHandler(async context =>
     MicopyConfiguration configuration;
     if (string.IsNullOrEmpty(configFile))
     {
-        configuration = new MicopyConfiguration(
-            new[] { new FolderConfiguration(source!, destination!, null) },
-            null,
-            parallel
-        );
+        configuration = new MicopyConfiguration {
+            Folders = new[] { new FolderConfiguration { Source = source!, Destination = destination!, IgnorePatternName = null } },
+            IgnorePatterns = null,
+            Parallelism = parallel
+        };
     }
     else
     {

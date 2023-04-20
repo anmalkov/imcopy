@@ -1,6 +1,7 @@
 ﻿namespace Micopy.Configuration;
 
-public record IgnorePatternConfiguration(
-    string Name, 
-    IEnumerable<string> Patterns
-);
+public class IgnorePatternConfiguration
+{
+    public string Name { get; set; }
+    public IEnumerable<string> Patterns { get; set; }
+}

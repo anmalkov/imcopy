@@ -1,7 +1,8 @@
 ﻿namespace Micopy.Configuration;
 
-public record MicopyConfiguration(
-    IEnumerable<FolderConfiguration> Folders,
-    IEnumerable<IgnorePatternConfiguration>? IgnorePatterns,
-    int? Parallelism
-);
+public class MicopyConfiguration
+{
+    public IEnumerable<FolderConfiguration> Folders { get; set; }
+    public IEnumerable<IgnorePatternConfiguration>? IgnorePatterns { get; set; }
+    public int? Parallelism { get; set; }
+}
