@@ -3,6 +3,6 @@
 public class DirectoryConfiguration
 {
     public string Source { get; set; } = "";
-    public string Destination { get; set; } = "";
+    public IEnumerable<string> Destinations { get; set; } = new List<string>();
     public string? IgnorePattern { get; set; }
 }

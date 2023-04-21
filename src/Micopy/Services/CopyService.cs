@@ -3,13 +3,14 @@ using System.CommandLine;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using DotNet.Globbing;
+using System.IO;
 
 namespace Micopy.Services;
 
 public record FileItem(
     string FileName,
     string SourceDirectory,
-    string DestinationDirectory
+    IEnumerable<string> DestinationDirectories
 );
 
 public class CopyService
@@ -101,14 +102,16 @@ public class CopyService
 
     private static void CopyFile(FileItem file)
     {
-        if (!Directory.Exists(file.DestinationDirectory))
-        {
-            Directory.CreateDirectory(file.DestinationDirectory);
-        }
-
         var sourceFile = Path.Combine(file.SourceDirectory, file.FileName);
-        var destinationFile = Path.Combine(file.DestinationDirectory, file.FileName);
-        File.Copy(sourceFile, destinationFile, overwrite: true);
+        foreach (var destinationDirectory in file.DestinationDirectories)
+        {
+            if (!Directory.Exists(destinationDirectory))
+            {
+                Directory.CreateDirectory(destinationDirectory);
+            }
+            var destinationFile = Path.Combine(destinationDirectory, file.FileName);
+            File.Copy(sourceFile, destinationFile, overwrite: true);
+        }
     }
 
     private IEnumerable<FileItem> GetFiles(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
@@ -122,34 +125,52 @@ public class CopyService
                 var ignorePattern = ignorePatterns.First(p => p.Name.Equals(directory.IgnorePattern, StringComparison.OrdinalIgnoreCase));
                 foreach (var pattern in ignorePattern.Patterns)
                 {
-                    excludeGlobs.Add(Glob.Parse(pattern));
+                    var modifiedPattern = pattern;
+                    if (!pattern.StartsWith(Path.DirectorySeparatorChar) && !pattern.StartsWith(Path.AltDirectorySeparatorChar) && !pattern.StartsWith("**"))
+                    {
+                        modifiedPattern = $"**/{pattern}";
+                    }
+                    excludeGlobs.Add(Glob.Parse(modifiedPattern));
                 }
             }
 
             var dirInfo = new DirectoryInfo(directory.Source);
             var fileInfos = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories);
 
-            var directoryFiles = fileInfos.Where(f => !excludeGlobs.Any(g => g.IsMatch(f.FullName)))
-                .Select(f => {
-                    var relativeDirectory = Path.GetDirectoryName(f.FullName) ?? "";
-                    if (!string.IsNullOrEmpty(relativeDirectory))
+            var directoryFiles = fileInfos
+                .Where(f =>
+                {
+                    var sourcePath = directory.Source;
+                    if (sourcePath.EndsWith(Path.DirectorySeparatorChar) || sourcePath.EndsWith(Path.AltDirectorySeparatorChar))
                     {
-                        relativeDirectory = relativeDirectory[directory.Source.Length..];
-                        if (relativeDirectory.StartsWith(Path.DirectorySeparatorChar) || relativeDirectory.StartsWith(Path.AltDirectorySeparatorChar))
-                        {
-                            relativeDirectory = relativeDirectory[1..];
-                        }
+                        sourcePath = sourcePath[..^1];
                     }
-                    var sourceDirectory = Path.Combine(directory.Source, relativeDirectory);
-                    var destinationDirectory = Path.Combine(directory.Destination, relativeDirectory);
+                    var relativeFilePath = f.FullName[sourcePath.Length..];
+                    return !excludeGlobs.Any(g => g.IsMatch(relativeFilePath));
+                })
+                .Select(f =>
+                {
+                    var relativePath = GetRelativePath(directory.Source, f.DirectoryName);
+                    var sourceDirectory = Path.Combine(directory.Source, relativePath);
+                    var destinationDirectories = directory.Destinations.Select(d => Path.Combine(d, relativePath)).ToArray();
                     var fileName = f.Name;
-                return new FileItem(fileName, sourceDirectory, destinationDirectory);
-            });
+                    return new FileItem(fileName, sourceDirectory, destinationDirectories);
+                });
 
             files.AddRange(directoryFiles);
         }
 
         return files;
+    }
+
+    private static string GetRelativePath(string rootDirectory, string? fullPath)
+    {
+        var relativeDirectory = string.IsNullOrEmpty(fullPath) ? "" : fullPath[rootDirectory.Length..];
+        if (relativeDirectory.StartsWith(Path.DirectorySeparatorChar) || relativeDirectory.StartsWith(Path.AltDirectorySeparatorChar))
+        {
+            relativeDirectory = relativeDirectory[1..];
+        }
+        return relativeDirectory;
     }
 
     private void DisplayProgressBar(int currentValue, int maxValue, int barSize = 50)

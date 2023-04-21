@@ -36,7 +36,7 @@ rootCommand.SetHandler(async context =>
     if (string.IsNullOrEmpty(configFile))
     {
         configuration = new MicopyConfiguration {
-            Directories = new[] { new DirectoryConfiguration { Source = source!, Destination = destination!, IgnorePattern = null } },
+            Directories = new[] { new DirectoryConfiguration { Source = source!, Destinations = new[] { destination! }, IgnorePattern = null } },
             IgnorePatterns = null,
             Parallelism = parallel
         };
