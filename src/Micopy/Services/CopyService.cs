@@ -8,8 +8,8 @@ namespace Micopy.Services;
 
 public record FileItem(
     string FileName,
-    string SourceFolder,
-    string DestinationFolder
+    string SourceDirectory,
+    string DestinationDirectory
 );
 
 public class CopyService
@@ -27,7 +27,7 @@ public class CopyService
     {
         if (configuration.Parallelism.HasValue && (configuration.Parallelism.Value == 0 || configuration.Parallelism.Value == 1))
         {
-            CopyDirectories(configuration.Folders, configuration.IgnorePatterns);
+            CopyDirectories(configuration.Directories, configuration.IgnorePatterns);
             return;
         }
 
@@ -36,7 +36,7 @@ public class CopyService
 
     private async Task CopyDirectoriesAsync(MicopyConfiguration configuration)
     {
-        var foundFiles = GetFiles(configuration.Folders, configuration.IgnorePatterns);
+        var foundFiles = GetFiles(configuration.Directories, configuration.IgnorePatterns);
         var files = new ConcurrentStack<FileItem>(foundFiles);
 
         var filesCount = files.Count;
@@ -78,9 +78,9 @@ public class CopyService
         DisplaySummary(filesCount, stopwatch);
     }
 
-    private void CopyDirectories(IEnumerable<FolderConfiguration> folders, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
+    private void CopyDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
     {
-        var foundFiles = GetFiles(folders, ignorePatterns);
+        var foundFiles = GetFiles(directories, ignorePatterns);
         var files = new Stack<FileItem>(foundFiles);
 
         var filesCount = files.Count;
@@ -101,49 +101,49 @@ public class CopyService
 
     private static void CopyFile(FileItem file)
     {
-        if (!Directory.Exists(file.DestinationFolder))
+        if (!Directory.Exists(file.DestinationDirectory))
         {
-            Directory.CreateDirectory(file.DestinationFolder);
+            Directory.CreateDirectory(file.DestinationDirectory);
         }
 
-        var sourceFile = Path.Combine(file.SourceFolder, file.FileName);
-        var destinationFile = Path.Combine(file.DestinationFolder, file.FileName);
+        var sourceFile = Path.Combine(file.SourceDirectory, file.FileName);
+        var destinationFile = Path.Combine(file.DestinationDirectory, file.FileName);
         File.Copy(sourceFile, destinationFile, overwrite: true);
     }
 
-    private IEnumerable<FileItem> GetFiles(IEnumerable<FolderConfiguration> folders, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
+    private IEnumerable<FileItem> GetFiles(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
     {
         var files = new List<FileItem>();
-        foreach (var folder in folders)
+        foreach (var directory in directories)
         {
             var excludeGlobs = new List<Glob>();
-            if (!string.IsNullOrEmpty(folder.IgnorePatternName) && ignorePatterns is not null)
+            if (!string.IsNullOrEmpty(directory.IgnorePattern) && ignorePatterns is not null)
             {
-                var ignorePattern = ignorePatterns.First(p => p.Name.Equals(folder.IgnorePatternName, StringComparison.OrdinalIgnoreCase));
+                var ignorePattern = ignorePatterns.First(p => p.Name.Equals(directory.IgnorePattern, StringComparison.OrdinalIgnoreCase));
                 foreach (var pattern in ignorePattern.Patterns)
                 {
                     excludeGlobs.Add(Glob.Parse(pattern));
                 }
             }
 
-            var dirInfo = new DirectoryInfo(folder.Source);
+            var dirInfo = new DirectoryInfo(directory.Source);
             var fileInfos = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories);
 
             var directoryFiles = fileInfos.Where(f => !excludeGlobs.Any(g => g.IsMatch(f.FullName)))
                 .Select(f => {
-                    var relativeFolder = Path.GetDirectoryName(f.FullName) ?? "";
-                    if (!string.IsNullOrEmpty(relativeFolder))
+                    var relativeDirectory = Path.GetDirectoryName(f.FullName) ?? "";
+                    if (!string.IsNullOrEmpty(relativeDirectory))
                     {
-                        relativeFolder = relativeFolder[folder.Source.Length..];
-                        if (relativeFolder.StartsWith(Path.DirectorySeparatorChar) || relativeFolder.StartsWith(Path.AltDirectorySeparatorChar))
+                        relativeDirectory = relativeDirectory[directory.Source.Length..];
+                        if (relativeDirectory.StartsWith(Path.DirectorySeparatorChar) || relativeDirectory.StartsWith(Path.AltDirectorySeparatorChar))
                         {
-                            relativeFolder = relativeFolder[1..];
+                            relativeDirectory = relativeDirectory[1..];
                         }
                     }
-                    var sourceFolder = Path.Combine(folder.Source, relativeFolder);
-                    var destinationFolder = Path.Combine(folder.Destination, relativeFolder);
+                    var sourceDirectory = Path.Combine(directory.Source, relativeDirectory);
+                    var destinationDirectory = Path.Combine(directory.Destination, relativeDirectory);
                     var fileName = f.Name;
-                return new FileItem(fileName, sourceFolder, destinationFolder);
+                return new FileItem(fileName, sourceDirectory, destinationDirectory);
             });
 
             files.AddRange(directoryFiles);

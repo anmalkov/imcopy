@@ -36,7 +36,7 @@ rootCommand.SetHandler(async context =>
     if (string.IsNullOrEmpty(configFile))
     {
         configuration = new MicopyConfiguration {
-            Folders = new[] { new FolderConfiguration { Source = source!, Destination = destination!, IgnorePatternName = null } },
+            Directories = new[] { new DirectoryConfiguration { Source = source!, Destination = destination!, IgnorePattern = null } },
             IgnorePatterns = null,
             Parallelism = parallel
         };
@@ -63,7 +63,7 @@ static bool ValidateParameters(string? configFile, string? source, string? desti
 {
     if (string.IsNullOrEmpty(configFile) && string.IsNullOrEmpty(source) && string.IsNullOrEmpty(destination))
     {
-        console.WriteLine("ERROR: Either configuration file or source and destination folders must be specified. Use option --help to get more details.");
+        console.WriteLine("ERROR: Either configuration file or source and destination directories must be specified. Use option --help to get more details.");
         return false;
     }
 
@@ -71,12 +71,12 @@ static bool ValidateParameters(string? configFile, string? source, string? desti
     {
         if (string.IsNullOrEmpty(source))
         {
-            console.WriteLine("ERROR: Source folder must be specified. Use option --help to get more details.");
+            console.WriteLine("ERROR: Source directory must be specified. Use option --help to get more details.");
             return false;
         }
         if (string.IsNullOrEmpty(destination))
         {
-            console.WriteLine("ERROR: Destination folder must be specified. Use option --help to get more details.");
+            console.WriteLine("ERROR: Destination directory must be specified. Use option --help to get more details.");
             return false;
         }
     } 
@@ -84,7 +84,7 @@ static bool ValidateParameters(string? configFile, string? source, string? desti
     {
         if (!string.IsNullOrEmpty(source) || !string.IsNullOrEmpty(destination))
         {
-            console.WriteLine("INFO: Source and destination folders will be ignored because configuration file is specified.");
+            console.WriteLine("INFO: Source and destination directories will be ignored because configuration file is specified.");
         }
     }
 
