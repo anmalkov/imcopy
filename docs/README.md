@@ -8,6 +8,12 @@ There are two ways how to use imcopy.
 
 This option allows you to copy all of the files from a source folder to a destination folder. You can also control parallelism.
 
+Parameters:
+
+- `--source` or `-s`: Source directory path
+- `--destination` or `-d`: Destination directory path
+- `--parallel` or `-p`: Degree of parallelism. If option is not specified or left empty, the default value (8) will be used. Specify an integer value for custom parallelism. If you do not want to use parallelism, specify 0 or 1 as a value.
+
 #### Examples
 
 1. Simple Linux command  
