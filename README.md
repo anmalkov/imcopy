@@ -1,6 +1,6 @@
-# micopy: Your Ultimate Directory Management Powerhouse
+# imcopy: Your Ultimate Directory Management Powerhouse
 
-**micopy** is a powerful and efficient CLI tool designed to simplify the process of copying and synchronizing files between directories. Whether you're a developer synchronizing source code, a creator organizing your massive photo or video library, or a business owner managing critical documents, **micopy** is your go-to tool for easy and efficient file synchronization. Leveraging the versatile .NET platform, **micopy** offers blazing-fast file transfers, customizable ignore patterns, real-time progress indicators, and intelligent copy control across multiple operating systems.
+**imcopy** is a powerful and efficient CLI tool designed to simplify the process of copying and synchronizing files between directories. Whether you're a developer synchronizing source code, a creator organizing your massive photo or video library, or a business owner managing critical documents, **imcopy** is your go-to tool for easy and efficient file synchronization. Leveraging the versatile .NET platform, **imcopy** offers blazing-fast file transfers, customizable ignore patterns, real-time progress indicators, and intelligent copy control across multiple operating systems.
 
 ## Key Features
 
@@ -13,13 +13,13 @@
 
 ## Installation and Usage
 
-To use **micopy**, follow the instructions in the [Getting Started](#getting-started) section.
+To use **imcopy**, follow the instructions in the [Getting Started](#getting-started) section.
 
 ## Getting Started
 
 ### Download Release
 
-1. Go to [Release page](https://github.com/anmalkov/micopy/releases)
+1. Go to [Release page](https://github.com/anmalkov/imcopy/releases)
 1. Choose a zip archive based on your architecture
 1. Download and extract a zip archive
 1. Enjoy effortless and efficient folder synchronization!
@@ -35,7 +35,7 @@ To use **micopy**, follow the instructions in the [Getting Started](#getting-sta
 
 ## Contributing
 
-**micopy** is an open-source project, and we encourage contributions from developers like you! We appreciate any bug reports, feature suggestions, code improvements, or even documentation updates. To contribute, please follow these steps:
+**imcopy** is an open-source project, and we encourage contributions from developers like you! We appreciate any bug reports, feature suggestions, code improvements, or even documentation updates. To contribute, please follow these steps:
 
 1. Fork the repository.
 1. Create a new branch for your changes.
@@ -46,10 +46,10 @@ For more information on contributing, please read our [Contribution Guide](/CONT
 
 ## License
 
-**micopy** is licensed under the [MIT License](https://github.com/anmalkov/micopy/blob/main/LICENSE).
+**imcopy** is licensed under the [MIT License](https://github.com/anmalkov/imcopy/blob/main/LICENSE).
 
 ## Community
 
-We are excited to have you join our growing community of **micopy** users and contributors! For any questions, suggestions, or discussions, please visit our [GitHub Discussions page](https://github.com/anmalkov/micopy/discussions).
+We are excited to have you join our growing community of **imcopy** users and contributors! For any questions, suggestions, or discussions, please visit our [GitHub Discussions page](https://github.com/anmalkov/imcopy/discussions).
 
-Together, we can make **micopy** the ultimate directory management tool for developers, photographers, business owners, and everyone in between. Let's build the future of folder synchronization!
+Together, we can make **imcopy** the ultimate directory management tool for developers, photographers, business owners, and everyone in between. Let's build the future of folder synchronization!

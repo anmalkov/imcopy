@@ -1,8 +1,8 @@
-# micopy docs
+# imcopy docs
 
 ## How to use
 
-There are two ways how to use micopy.
+There are two ways how to use imcopy.
 
 ### Simple option
 
@@ -13,13 +13,13 @@ This option allows you to copy all of the files from a source folder to a destin
 1. Simple Linux command  
   This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism.  
   ```bash
-  micopy --source /home/user/data --destination /home/user/archive/data
+  imcopy --source /home/user/data --destination /home/user/archive/data
   ```
 
 2. Simple Windows command  
   This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use default parallelism.  
   ```bash
-  micopy --source C:\Users\user\data --destination C:\Users\user\archive\data
+  imcopy --source C:\Users\user\data --destination C:\Users\user\archive\data
   ```
 
 ### Advance option
@@ -75,7 +75,7 @@ Here are some examples:
 
 ### Examples
 
-Here are some examples of patterns you can use in the micopy comfiguration file (micopy.yaml):
+Here are some examples of patterns you can use in the imcopy comfiguration file (imcopy.yaml):
 
 ```yaml
 ignorePatterns:

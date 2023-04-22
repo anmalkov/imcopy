@@ -1,6 +1,6 @@
 # Contribution Guide
 
-Thank you for your interest in contributing to micopy! We appreciate your time and efforts to make our project better. This guide outlines the steps and best practices for contributing to micopy.
+Thank you for your interest in contributing to imcopy! We appreciate your time and efforts to make our project better. This guide outlines the steps and best practices for contributing to imcopy.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ Thank you for your interest in contributing to micopy! We appreciate your time a
 Please follow our Code of Conduct to ensure a respectful and collaborative environment for everyone involved in the project.
 
 ## Setting Up Your Environment
-To contribute to micopy, you need to set up your environment correctly:
+To contribute to imcopy, you need to set up your environment correctly:
 
 1. Fork the repository on GitHub.
 1. Clone your forked repository to your local machine.
@@ -26,7 +26,7 @@ To contribute to micopy, you need to set up your environment correctly:
 
 ## Submitting a Bug Report
 
-If you've found a bug or an issue in micopy, please follow these steps to report it:
+If you've found a bug or an issue in imcopy, please follow these steps to report it:
 
 1. Check the GitHub Issues to see if the bug has already been reported.
 1. If it's not reported yet, create a new issue and use the "Bug Report" template to provide detailed information about the bug.
@@ -42,7 +42,7 @@ We love to hear your ideas for new features and improvements! To request a featu
 
 ## Contributing Code
 
-If you're ready to contribute code to micopy, please follow these steps:
+If you're ready to contribute code to imcopy, please follow these steps:
 
 1. Create a new branch for your changes.
 1. Write clean, well-commented, and properly indented code.
@@ -54,10 +54,10 @@ If you're ready to contribute code to micopy, please follow these steps:
 
 ## Documentation and Localization
 
-We value clear and comprehensive documentation, as well as localization to make micopy accessible to users worldwide. If you can help improve our documentation or contribute translations, please create a pull request with your changes.
+We value clear and comprehensive documentation, as well as localization to make imcopy accessible to users worldwide. If you can help improve our documentation or contribute translations, please create a pull request with your changes.
 
 ## Support and Community
 
-If you have any questions, suggestions, or need support, feel free to visit our [GitHub Discussions](https://github.com/anmalkov/micopy/discussions) page.
+If you have any questions, suggestions, or need support, feel free to visit our [GitHub Discussions](https://github.com/anmalkov/imcopy/discussions) page.
 
-Thank you for your interest in contributing to micopy! Together, we can make it the ultimate directory management tool for everyone.
+Thank you for your interest in contributing to imcopy! Together, we can make it the ultimate directory management tool for everyone.
