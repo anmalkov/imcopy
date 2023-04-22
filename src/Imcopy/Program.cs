@@ -1,5 +1,5 @@
-﻿using Micopy.Configuration;
-using Micopy.Services;
+﻿using Imcopy.Configuration;
+using Imcopy.Services;
 using System.CommandLine;
 using System.CommandLine.IO;
 
@@ -32,10 +32,10 @@ rootCommand.SetHandler(async context =>
 
     var copyService = new CopyService(context.Console);
 
-    MicopyConfiguration configuration;
+    ImcopyConfiguration configuration;
     if (string.IsNullOrEmpty(configFile))
     {
-        configuration = new MicopyConfiguration {
+        configuration = new ImcopyConfiguration {
             Directories = new[] { new DirectoryConfiguration { Source = source!, Destinations = new[] { destination! }, IgnorePattern = null } },
             IgnorePatterns = null,
             Parallelism = parallel

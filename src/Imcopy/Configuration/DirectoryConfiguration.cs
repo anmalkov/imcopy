@@ -1,4 +1,4 @@
-﻿namespace Micopy.Configuration;
+﻿namespace Imcopy.Configuration;
 
 public class DirectoryConfiguration
 {

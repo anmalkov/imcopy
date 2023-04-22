@@ -1,12 +1,12 @@
-﻿using Micopy.Configuration;
+﻿using Imcopy.Configuration;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 
-namespace Micopy.Services;
+namespace Imcopy.Services;
 
 internal static class ConfigurationService
 {
-    public static async Task<(MicopyConfiguration? Configuration, Exception? Exception)> LoadAsync(string path)
+    public static async Task<(ImcopyConfiguration? Configuration, Exception? Exception)> LoadAsync(string path)
     {
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
@@ -17,7 +17,7 @@ internal static class ConfigurationService
 
         try
         {
-            return (deserializer.Deserialize<MicopyConfiguration>(yaml), null);
+            return (deserializer.Deserialize<ImcopyConfiguration>(yaml), null);
         }
         catch (Exception ex)
         {

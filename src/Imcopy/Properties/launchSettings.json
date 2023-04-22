@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Imcopy": {
+      "commandName": "Project",
+      "commandLineArgs": "--file imcopy.yaml"
+    }
+  }
+}

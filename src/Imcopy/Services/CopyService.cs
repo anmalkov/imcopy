@@ -1,11 +1,11 @@
-﻿using Micopy.Configuration;
+﻿using Imcopy.Configuration;
 using System.CommandLine;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using DotNet.Globbing;
 using System.IO;
 
-namespace Micopy.Services;
+namespace Imcopy.Services;
 
 public record FileItem(
     string FileName,
@@ -24,7 +24,7 @@ public class CopyService
         this.console = console;
     }
 
-    public async Task CopyAsync(MicopyConfiguration configuration)
+    public async Task CopyAsync(ImcopyConfiguration configuration)
     {
         if (configuration.Parallelism.HasValue && (configuration.Parallelism.Value == 0 || configuration.Parallelism.Value == 1))
         {
@@ -35,7 +35,7 @@ public class CopyService
         await CopyDirectoriesAsync(configuration);
     }
 
-    private async Task CopyDirectoriesAsync(MicopyConfiguration configuration)
+    private async Task CopyDirectoriesAsync(ImcopyConfiguration configuration)
     {
         var foundFiles = GetFiles(configuration.Directories, configuration.IgnorePatterns);
         var files = new ConcurrentStack<FileItem>(foundFiles);

@@ -30,30 +30,30 @@ jobs:
         echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
         VERSION=${TAG_NAME#v}
         echo "Updating project version to $VERSION"
-        sed -i "s/<AssemblyVersion>.*<\/AssemblyVersion>/<AssemblyVersion>$VERSION<\/AssemblyVersion>/g" Micopy.csproj
-        sed -i "s/<FileVersion>.*<\/FileVersion>/<FileVersion>$VERSION<\/FileVersion>/g" Micopy.csproj
-        cat Micopy.csproj
-      working-directory: src/Micopy
+        sed -i "s/<AssemblyVersion>.*<\/AssemblyVersion>/<AssemblyVersion>$VERSION<\/AssemblyVersion>/g" Imcopy.csproj
+        sed -i "s/<FileVersion>.*<\/FileVersion>/<FileVersion>$VERSION<\/FileVersion>/g" Imcopy.csproj
+        cat Imcopy.csproj
+      working-directory: src/Imcopy
 
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: src/Micopy
+      working-directory: src/Imcopy
 
     - name: Build application
       run: dotnet build --configuration Release --no-restore
-      working-directory: src/Micopy
+      working-directory: src/Imcopy
 
     - name: Publish application for Windows
       run: dotnet publish --configuration Release --no-restore --self-contained -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/win-x64 /p:DebugType=None
-      working-directory: src/Micopy
+      working-directory: src/Imcopy
 
     - name: Publish application for Linux
       run: dotnet publish --configuration Release --no-restore --self-contained -r linux-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/linux-x64 /p:DebugType=None
-      working-directory: src/Micopy
+      working-directory: src/Imcopy
 
     - name: Publish application for ARM
       run: dotnet publish --configuration Release --no-restore --self-contained -r linux-arm -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/linux-arm /p:DebugType=None
-      working-directory: src/Micopy
+      working-directory: src/Imcopy
 
     - name: Zip publish folders
       run: |
@@ -62,7 +62,7 @@ jobs:
         zip -r -j publish/linux-x64.zip publish/linux-x64
         zip -r -j publish/linux-arm.zip publish/linux-arm
         ls publish
-      working-directory: src/Micopy
+      working-directory: src/Imcopy
 
     - name: Create GitHub Release
       env:
@@ -77,4 +77,4 @@ jobs:
         gh release upload "$TAG_NAME" win-x64.zip linux-x64.zip linux-arm.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      working-directory: src/Micopy/publish
+      working-directory: src/Imcopy/publish

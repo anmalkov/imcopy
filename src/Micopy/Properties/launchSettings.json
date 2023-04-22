@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Micopy": {
-      "commandName": "Project",
-      "commandLineArgs": "--file micopy.yaml"
-    }
-  }
-}
