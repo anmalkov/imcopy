@@ -23,7 +23,7 @@ To use **micopy**, follow the instructions in the [Getting Started](#getting-sta
 1. Choose a zip archive based on your architecture
 1. Download and extract a zip archive
 1. Enjoy effortless and efficient folder synchronization!
-1. For more detailed information, please refer to our Wiki and FAQ pages.
+1. For more detailed information, please refer to our [docs](/docs/README.md) pages.
 
 ### Running in Visual Studio
 
@@ -31,7 +31,7 @@ To use **micopy**, follow the instructions in the [Getting Started](#getting-sta
 1. Build the solution using the .NET CLI or Visual Studio.
 1. Run the console application with the appropriate command-line arguments and options.
 1. Enjoy effortless and efficient folder synchronization!
-1. For more detailed information, please refer to our Wiki and FAQ pages.
+1. For more detailed information, please refer to our [docs](/docs/README.md) pages.
 
 ## Contributing
 
