@@ -18,9 +18,9 @@ Parameters:
 
 1. Simple Linux command  
   This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism (8).  
-  ```bash
-  imcopy --source /home/user/data --destination /home/user/archive/data
-  ```
+    ```bash
+    imcopy --source /home/user/data --destination /home/user/archive/data
+    ```
 
 2. Simple Windows command  
   This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use custom parallelism (16).  
