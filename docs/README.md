@@ -12,22 +12,26 @@ Parameters:
 
 - `--source` or `-s`: Source directory path
 - `--destination` or `-d`: Destination directory path
-- `--parallel` or `-p`: Degree of parallelism. If option is not specified or left empty, the default value (8) will be used. Specify an integer value for custom parallelism. If you do not want to use parallelism (to copy files sequentially), specify 0 or 1 as a value.
+- `--parallel` or `-p`: Degree of parallelism. If option is not specified or left empty, the default value (`8`) will be used. Specify an integer value for custom parallelism. If you do not want to use parallelism (to copy files sequentially), specify 0 or 1 as a value.
+- `--overwrite` or `-o`: Files overwrite behavior. If option is not specified, the default value (`ifNewer`) will be used. Possible values:
+  - always: Overwrite all the files in the destination directory.
+  - ifNewer: Overwrite a file in the destination directory only if a file in the source directory is newer.
+  - never: Do NOT copy a file if it is already exist in the destination directory.
 
 #### Examples
 
 1. Simple Linux command  
-  This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism (8).
+  This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism (`8`) and default files overwrite behavior (`ifNewer`).
   
     ```bash
     imcopy --source /home/user/data --destination /home/user/archive/data
     ```
 
 2. Simple Windows command  
-  This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use custom parallelism (16).
+  This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use custom parallelism (`16`) and files overwrite behavior (`always`).
   
     ```bash
-    .\imcopy.exe --source C:\Users\user\data --destination C:\Users\user\archive\data --parallel 16
+    .\imcopy.exe --source C:\Users\user\data --destination C:\Users\user\archive\data --parallel 16 --overwrite always
     ```
 
 ### Advance option
