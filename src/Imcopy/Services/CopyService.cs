@@ -3,19 +3,20 @@ using System.CommandLine;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using DotNet.Globbing;
-using System.IO;
 
 namespace Imcopy.Services;
 
 public record FileItem(
     string FileName,
     string SourceDirectory,
-    IEnumerable<string> DestinationDirectories
+    IEnumerable<string> DestinationDirectories,
+    OverwriteBehavior? OverwriteBehavior
 );
 
 public class CopyService
 {
     public const int DefaultParallelism = 8;
+    public const OverwriteBehavior DefaultOverwriteBehavior = OverwriteBehavior.IfNewer;
 
     private readonly IConsole console;
 
@@ -110,6 +111,21 @@ public class CopyService
                 Directory.CreateDirectory(destinationDirectory);
             }
             var destinationFile = Path.Combine(destinationDirectory, file.FileName);
+            var overwriteBehavior = file.OverwriteBehavior ?? DefaultOverwriteBehavior;
+            if ((overwriteBehavior == OverwriteBehavior.IfNewer || overwriteBehavior == OverwriteBehavior.Never) && File.Exists(destinationFile))
+            {
+                if (overwriteBehavior == OverwriteBehavior.Never)
+                {
+                    continue;
+                }
+
+                var sourceFileInfo = new FileInfo(sourceFile);
+                var destinationFileInfo = new FileInfo(destinationFile);
+                if (sourceFileInfo.LastWriteTimeUtc <= destinationFileInfo.LastWriteTimeUtc)
+                {
+                    continue;
+                }
+            }
             File.Copy(sourceFile, destinationFile, overwrite: true);
         }
     }
@@ -154,7 +170,7 @@ public class CopyService
                     var sourceDirectory = Path.Combine(directory.Source, relativePath);
                     var destinationDirectories = directory.Destinations.Select(d => Path.Combine(d, relativePath)).ToArray();
                     var fileName = f.Name;
-                    return new FileItem(fileName, sourceDirectory, destinationDirectories);
+                    return new FileItem(fileName, sourceDirectory, destinationDirectories, directory.OverwriteBehavior);
                 });
 
             files.AddRange(directoryFiles);
