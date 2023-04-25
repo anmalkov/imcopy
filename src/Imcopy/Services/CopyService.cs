@@ -42,6 +42,7 @@ public class CopyService
         var files = new ConcurrentStack<FileItem>(foundFiles);
 
         var filesCount = files.Count;
+        var filesProcessed = 0;
         var filesCopied = 0;
 
         var parallelism = configuration.Parallelism.HasValue ? configuration.Parallelism.Value : DefaultParallelism;
@@ -60,11 +61,12 @@ public class CopyService
                 {
                     if (files.TryPop(out var file))
                     {
-                        CopyFile(file);
-                        var newFilesCopied = Interlocked.Increment(ref filesCopied);
+                        var sourceFileCopiedCount =  CopyFile(file);
+                        Interlocked.Add(ref filesCopied, sourceFileCopiedCount);
+                        var newFilesProcessed = Interlocked.Increment(ref filesProcessed);
                         lock (lockObject)
                         {
-                            DisplayProgressBar(newFilesCopied, filesCount);
+                            DisplayProgressBar(newFilesProcessed, filesCount);
                         }
                     }
                 }
@@ -77,7 +79,7 @@ public class CopyService
         await Task.WhenAll(tasks);
         stopwatch.Stop();
 
-        DisplaySummary(filesCount, stopwatch);
+        DisplaySummary(filesCount, filesCopied, stopwatch);
     }
 
     private void CopyDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
@@ -86,23 +88,25 @@ public class CopyService
         var files = new Stack<FileItem>(foundFiles);
 
         var filesCount = files.Count;
+        var filesProcessed = 0;
         var filesCopied = 0;
 
         var stopwatch = Stopwatch.StartNew();
         while (files.Count > 0)
         {
             var file = files.Pop();
-            CopyFile(file);
-            filesCopied++;
-            DisplayProgressBar(filesCopied, filesCount);
+            filesCopied += CopyFile(file);
+            filesProcessed++;
+            DisplayProgressBar(filesProcessed, filesCount);
         }
         stopwatch.Stop();
 
-        DisplaySummary(filesCount, stopwatch);
+        DisplaySummary(filesCount, filesCopied, stopwatch);
     }
 
-    private static void CopyFile(FileItem file)
+    private static int CopyFile(FileItem file)
     {
+        var copiedFiles = 0;
         var sourceFile = Path.Combine(file.SourceDirectory, file.FileName);
         foreach (var destinationDirectory in file.DestinationDirectories)
         {
@@ -127,7 +131,9 @@ public class CopyService
                 }
             }
             File.Copy(sourceFile, destinationFile, overwrite: true);
+            copiedFiles++;
         }
+        return copiedFiles;
     }
 
     private IEnumerable<FileItem> GetFiles(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
@@ -200,8 +206,8 @@ public class CopyService
         console.Write(new string(' ', emptyBars));
         console.Write($"] {progressFraction:P0}");
     }
-    private void DisplaySummary(int filesCount, Stopwatch stopwatch)
+    private void DisplaySummary(int filesCount, int filesCopied, Stopwatch stopwatch)
     {
-        console.WriteLine($"{Environment.NewLine}{filesCount} files copied in {stopwatch.Elapsed}");
+        console.WriteLine($"{Environment.NewLine}{filesCount} files processed in {stopwatch.Elapsed}. {filesCopied} files were copied.");
     }
 }
