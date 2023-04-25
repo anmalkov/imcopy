@@ -3,15 +3,22 @@ using System.CommandLine;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using DotNet.Globbing;
+using System.IO;
 
 namespace Imcopy.Services;
 
 public record FileItem(
     string FileName,
-    string SourceDirectory,
+    string SourceFileFullPath,
     IEnumerable<string> DestinationDirectories,
     OverwriteBehavior? OverwriteBehavior
 );
+
+public record DestinationFileItem(
+    string SourceFileFullPath,
+    string DestinationFileFullPath
+);
+
 
 public class CopyService
 {
@@ -38,6 +45,8 @@ public class CopyService
 
     private async Task CopyDirectoriesAsync(ImcopyConfiguration configuration)
     {
+        var stopwatch = Stopwatch.StartNew();
+
         var foundFiles = GetFiles(configuration.Directories, configuration.IgnorePatterns);
         var files = new ConcurrentStack<FileItem>(foundFiles);
 
@@ -51,7 +60,6 @@ public class CopyService
         var lockObject = new object();
         var tasks = new List<Task>(filesCount);
 
-        var stopwatch = Stopwatch.StartNew();
         while (!files.IsEmpty)
         {
             await concurrencySemaphore.WaitAsync();
@@ -61,7 +69,7 @@ public class CopyService
                 {
                     if (files.TryPop(out var file))
                     {
-                        var sourceFileCopiedCount =  CopyFile(file);
+                        var sourceFileCopiedCount = CopyFile(file);
                         Interlocked.Add(ref filesCopied, sourceFileCopiedCount);
                         var newFilesProcessed = Interlocked.Increment(ref filesProcessed);
                         lock (lockObject)
@@ -79,35 +87,67 @@ public class CopyService
         await Task.WhenAll(tasks);
         stopwatch.Stop();
 
-        DisplaySummary(filesCount, filesCopied, stopwatch);
+        var deleteStopwatch = Stopwatch.StartNew();
+        int filesToDeleteCount = DeleteFilesInDestinationDirectories(configuration.Directories, foundFiles);
+        deleteStopwatch.Stop();
+
+        DisplaySummary(filesCount, filesCopied, stopwatch, filesToDeleteCount, deleteStopwatch);
+    }
+
+    private int DeleteFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<FileItem> foundFiles)
+    {
+        var filesInDestinations = GetAllFilesInDestinationDirectories(directories);
+        var filesToDelete = filesInDestinations.Where(df => !foundFiles.Any(f => f.SourceFileFullPath == df.SourceFileFullPath)).ToArray();
+
+        var filesToDeleteCount = filesToDelete.Length;
+
+        foreach (var file in filesToDelete)
+        {
+            DeleteFile(file);
+        }
+
+        return filesToDeleteCount;
+    }
+
+    private static void DeleteFile(DestinationFileItem file)
+    {
+        File.Delete(file.DestinationFileFullPath);
+        var directory = Path.GetDirectoryName(file.DestinationFileFullPath);
+        var dirInfo = new DirectoryInfo(directory);
+        if (dirInfo.GetFiles().Length == 0 && dirInfo.GetDirectories().Length == 0)
+        {
+            Directory.Delete(directory);
+        }
     }
 
     private void CopyDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
     {
-        var foundFiles = GetFiles(directories, ignorePatterns);
-        var files = new Stack<FileItem>(foundFiles);
+        var stopwatch = Stopwatch.StartNew();
 
-        var filesCount = files.Count;
+        var foundFiles = GetFiles(directories, ignorePatterns);
+
+        var filesCount = foundFiles.Count();
         var filesProcessed = 0;
         var filesCopied = 0;
 
-        var stopwatch = Stopwatch.StartNew();
-        while (files.Count > 0)
+        foreach (var file in foundFiles)
         {
-            var file = files.Pop();
             filesCopied += CopyFile(file);
             filesProcessed++;
             DisplayProgressBar(filesProcessed, filesCount);
         }
         stopwatch.Stop();
 
-        DisplaySummary(filesCount, filesCopied, stopwatch);
+        var deleteStopwatch = Stopwatch.StartNew();
+        int filesToDeleteCount = DeleteFilesInDestinationDirectories(directories, foundFiles);
+        deleteStopwatch.Stop();
+
+        DisplaySummary(filesCount, filesCopied, stopwatch, filesToDeleteCount, deleteStopwatch);
     }
 
     private static int CopyFile(FileItem file)
     {
         var copiedFiles = 0;
-        var sourceFile = Path.Combine(file.SourceDirectory, file.FileName);
         foreach (var destinationDirectory in file.DestinationDirectories)
         {
             if (!Directory.Exists(destinationDirectory))
@@ -123,14 +163,14 @@ public class CopyService
                     continue;
                 }
 
-                var sourceFileInfo = new FileInfo(sourceFile);
+                var sourceFileInfo = new FileInfo(file.SourceFileFullPath);
                 var destinationFileInfo = new FileInfo(destinationFile);
                 if (sourceFileInfo.LastWriteTimeUtc <= destinationFileInfo.LastWriteTimeUtc)
                 {
                     continue;
                 }
             }
-            File.Copy(sourceFile, destinationFile, overwrite: true);
+            File.Copy(file.SourceFileFullPath, destinationFile, overwrite: true);
             copiedFiles++;
         }
         return copiedFiles;
@@ -173,13 +213,37 @@ public class CopyService
                 .Select(f =>
                 {
                     var relativePath = GetRelativePath(directory.Source, f.DirectoryName);
-                    var sourceDirectory = Path.Combine(directory.Source, relativePath);
                     var destinationDirectories = directory.Destinations.Select(d => Path.Combine(d, relativePath)).ToArray();
                     var fileName = f.Name;
-                    return new FileItem(fileName, sourceDirectory, destinationDirectories, directory.OverwriteBehavior);
+                    return new FileItem(fileName, f.FullName, destinationDirectories, directory.OverwriteBehavior);
                 });
 
             files.AddRange(directoryFiles);
+        }
+
+        return files;
+    }
+
+    private IEnumerable<DestinationFileItem> GetAllFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories)
+    {
+        var files = new List<DestinationFileItem>();
+        foreach (var directory in directories)
+        {
+            foreach (var destination in directory.Destinations)
+            {
+                var dirInfo = new DirectoryInfo(destination);
+                var fileInfos = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories);
+
+                var directoryFiles = fileInfos
+                    .Select(f =>
+                    {
+                        var relativePath = GetRelativePath(destination, f.DirectoryName);
+                        var sourceFileFullName = Path.Combine(directory.Source, relativePath, f.Name);
+                        return new DestinationFileItem(sourceFileFullName, f.FullName);
+                    });
+
+                files.AddRange(directoryFiles);
+            }
         }
 
         return files;
@@ -206,8 +270,9 @@ public class CopyService
         console.Write(new string(' ', emptyBars));
         console.Write($"] {progressFraction:P0}");
     }
-    private void DisplaySummary(int filesCount, int filesCopied, Stopwatch stopwatch)
+    private void DisplaySummary(int filesCount, int filesCopied, Stopwatch stopwatch, int filesToDeleteCount, Stopwatch deleteStopwatch)
     {
         console.WriteLine($"{Environment.NewLine}{filesCount} files processed in {stopwatch.Elapsed}. {filesCopied} files were copied.");
+        console.WriteLine($"{filesToDeleteCount} files deleted in {deleteStopwatch.Elapsed}.");
     }
 }
