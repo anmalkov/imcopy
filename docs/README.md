@@ -14,9 +14,9 @@ Parameters:
 - `--destination` or `-d`: Destination directory path
 - `--parallel` or `-p`: Degree of parallelism. If option is not specified or left empty, the default value (`8`) will be used. Specify an integer value for custom parallelism. If you do not want to use parallelism (to copy files sequentially), specify 0 or 1 as a value.
 - `--overwrite` or `-o`: Files overwrite behavior. If option is not specified, the default value (`ifNewer`) will be used. Possible values:
-  - always: Overwrite all the files in the destination directory.
-  - ifNewer: Overwrite a file in the destination directory only if a file in the source directory is newer.
-  - never: Do NOT copy a file if it is already exist in the destination directory.
+  - `always`: Overwrite all the files in the destination directory.
+  - `ifNewer`: Overwrite a file in the destination directory only if a file in the source directory is newer.
+  - `never`: Do NOT copy a file if it is already exist in the destination directory.
 
 #### Examples
 
