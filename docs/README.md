@@ -16,7 +16,7 @@ Parameters:
 - `--overwrite` or `-o`: Files overwrite behavior. If option is not specified, the default value (`ifNewer`) will be used. Possible values:
   - `always`: Overwrite all the files in the destination directory.
   - `ifNewer`: Overwrite a file in the destination directory only if a file in the source directory is newer.
-  - `never`: Do NOT copy a file if it is already exist in the destination directory.
+  - `never`: Do NOT copy a file if it already exists in the destination directory.
 
 #### Examples
 
