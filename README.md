@@ -7,6 +7,7 @@
 - Blazing Fast File Transfer: Built-in parallelism support for fast and efficient file transfers.
 - Customizable Ignore Patterns: Selectively copy files using YAML configuration and .gitignore-like patterns.
 - Multi-Destination Copying: Effortlessly copy files to multiple destination directories with a single command.
+- Granular Overwrite Control: Customize overwrite behavior for each source directory.
 - Real-time Progress Indicator: Stay informed with a visually appealing progress bar.
 - Intelligent Copy Control: Specify the degree of parallelism, from sequential copying to multithreaded transfers.
 - Cross-platform Compatibility: Seamlessly works across multiple operating systems thanks to the .NET platform.
