@@ -6,7 +6,7 @@ There are two ways how to use imcopy.
 
 ### Simple option
 
-This option allows you to copy all of the files from a source folder to a destination folder. You can also control parallelism.
+This option allows you to copy all of the files from a source folder to a single destination folder. You can also control parallelism and files overwrite and remove behavior.
 
 Parameters:
 
