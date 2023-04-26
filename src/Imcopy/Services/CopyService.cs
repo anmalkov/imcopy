@@ -3,20 +3,20 @@ using System.CommandLine;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using DotNet.Globbing;
-using System.IO;
 
 namespace Imcopy.Services;
 
 public record FileItem(
     string FileName,
-    string SourceFileFullPath,
+    string SourceFileFullName,
     IEnumerable<string> DestinationDirectories,
     OverwriteBehavior? OverwriteBehavior
 );
 
 public record DestinationFileItem(
     string SourceFileFullPath,
-    string DestinationFileFullPath
+    string DestinationFileFullName,
+    string DestinationDirectoryName
 );
 
 
@@ -96,8 +96,8 @@ public class CopyService
 
     private int DeleteFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<FileItem> foundFiles)
     {
-        var filesInDestinations = GetAllFilesInDestinationDirectories(directories);
-        var filesToDelete = filesInDestinations.Where(df => !foundFiles.Any(f => f.SourceFileFullPath == df.SourceFileFullPath)).ToArray();
+        var filesInDestinations = GetAllFilesInDestinationDirectories(directories.Where(d => d.RemoveBehavior == RemoveBehavior.Remove));
+        var filesToDelete = filesInDestinations.Where(df => !foundFiles.Any(f => f.SourceFileFullName == df.SourceFileFullPath)).ToArray();
 
         var filesToDeleteCount = filesToDelete.Length;
 
@@ -111,12 +111,11 @@ public class CopyService
 
     private static void DeleteFile(DestinationFileItem file)
     {
-        File.Delete(file.DestinationFileFullPath);
-        var directory = Path.GetDirectoryName(file.DestinationFileFullPath);
-        var dirInfo = new DirectoryInfo(directory);
+        File.Delete(file.DestinationFileFullName);
+        var dirInfo = new DirectoryInfo(file.DestinationDirectoryName);
         if (dirInfo.GetFiles().Length == 0 && dirInfo.GetDirectories().Length == 0)
         {
-            Directory.Delete(directory);
+            Directory.Delete(file.DestinationDirectoryName);
         }
     }
 
@@ -163,14 +162,14 @@ public class CopyService
                     continue;
                 }
 
-                var sourceFileInfo = new FileInfo(file.SourceFileFullPath);
+                var sourceFileInfo = new FileInfo(file.SourceFileFullName);
                 var destinationFileInfo = new FileInfo(destinationFile);
                 if (sourceFileInfo.LastWriteTimeUtc <= destinationFileInfo.LastWriteTimeUtc)
                 {
                     continue;
                 }
             }
-            File.Copy(file.SourceFileFullPath, destinationFile, overwrite: true);
+            File.Copy(file.SourceFileFullName, destinationFile, overwrite: true);
             copiedFiles++;
         }
         return copiedFiles;
@@ -239,7 +238,7 @@ public class CopyService
                     {
                         var relativePath = GetRelativePath(destination, f.DirectoryName);
                         var sourceFileFullName = Path.Combine(directory.Source, relativePath, f.Name);
-                        return new DestinationFileItem(sourceFileFullName, f.FullName);
+                        return new DestinationFileItem(sourceFileFullName, f.FullName, f.DirectoryName!);
                     });
 
                 files.AddRange(directoryFiles);

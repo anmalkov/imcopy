@@ -6,5 +6,5 @@ public class DirectoryConfiguration
     public IEnumerable<string> Destinations { get; set; } = new List<string>();
     public string? IgnorePattern { get; set; }
     public OverwriteBehavior? OverwriteBehavior { get; set; }
-
+    public RemoveBehavior? RemoveBehavior { get; set; }
 }

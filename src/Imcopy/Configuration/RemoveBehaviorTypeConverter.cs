@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Imcopy.Configuration;
 
-internal class OverwriteBehaviorTypeConverter: TypeConverter
+internal class RemoveBehaviorTypeConverter: TypeConverter
 {
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
     {
@@ -15,9 +15,8 @@ internal class OverwriteBehaviorTypeConverter: TypeConverter
         return value is string stringValue 
             ? stringValue switch
             {
-                "always" => OverwriteBehavior.Always,
-                "ifNewer" => OverwriteBehavior.IfNewer,
-                "never" => OverwriteBehavior.Never,
+                "keep" => RemoveBehavior.Keep,
+                "remove" => RemoveBehavior.Remove,
                 _ => throw new ArgumentOutOfRangeException(nameof(value), "Invalid overwrite behavior."),
             }
             : base.ConvertFrom(context, culture, value);
@@ -30,12 +29,11 @@ internal class OverwriteBehaviorTypeConverter: TypeConverter
 
     public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
     {
-        return value is OverwriteBehavior overwriteBehavior && destinationType == typeof(string)
-            ? overwriteBehavior switch
+        return value is RemoveBehavior removeBehavior && destinationType == typeof(string)
+            ? removeBehavior switch
             {
-                OverwriteBehavior.Always => "always",
-                OverwriteBehavior.IfNewer => "ifNewer",
-                OverwriteBehavior.Never => "never",
+                RemoveBehavior.Keep => "keep",
+                RemoveBehavior.Remove => "remove",
                 _ => throw new ArgumentOutOfRangeException(nameof(value), "Invalid overwrite behavior."),
             }
             : base.ConvertTo(context, culture, value, destinationType);
