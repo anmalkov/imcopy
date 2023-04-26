@@ -24,6 +24,7 @@ public class CopyService
 {
     public const int DefaultParallelism = 8;
     public const OverwriteBehavior DefaultOverwriteBehavior = OverwriteBehavior.IfNewer;
+    public const RemoveBehavior DefaultRemoveBehavior = RemoveBehavior.Remove;
 
     private readonly IConsole console;
 
@@ -96,7 +97,7 @@ public class CopyService
 
     private int DeleteFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<FileItem> foundFiles)
     {
-        var filesInDestinations = GetAllFilesInDestinationDirectories(directories.Where(d => d.RemoveBehavior == RemoveBehavior.Remove));
+        var filesInDestinations = GetAllFilesInDestinationDirectories(directories.Where(d => (d.RemoveBehavior ?? DefaultRemoveBehavior) == RemoveBehavior.Remove));
         var filesToDelete = filesInDestinations.Where(df => !foundFiles.Any(f => f.SourceFileFullName == df.SourceFileFullPath)).ToArray();
 
         var filesToDeleteCount = filesToDelete.Length;
