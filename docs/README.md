@@ -6,7 +6,7 @@ There are two ways how to use imcopy.
 
 ### Simple option
 
-This option allows you to copy all of the files from a source folder to a destination folder. You can also control parallelism.
+This option allows you to copy all of the files from a source folder to a single destination folder. You can also control parallelism and files overwrite and remove behavior.
 
 Parameters:
 
@@ -17,21 +17,24 @@ Parameters:
   - `always`: Overwrite all the files in the destination directory.
   - `ifNewer`: Overwrite a file in the destination directory only if a file in the source directory is newer.
   - `never`: Do NOT copy a file if it already exists in the destination directory.
+- `--remove` or `-r`: Files remove behavior. If option is not specified, the default value (`remove`) will be used. Possible values:
+  - `keep`: Keep extra files in the destination directory that do NOT exist in the source directory.
+  - `remove`: Remove extra files in the destination directory that do NOT exist in the source directory.
 
 #### Examples
 
 1. Simple Linux command  
-  This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism (`8`) and default files overwrite behavior (`ifNewer`).
+  This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism (`8`), default files overwrite behavior (`ifNewer`), and default files remove behavior (`remove`).
   
     ```bash
     imcopy --source /home/user/data --destination /home/user/archive/data
     ```
 
 2. Simple Windows command  
-  This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use custom parallelism (`16`) and files overwrite behavior (`always`).
+  This command will copy all files from `C:\Users\user\data` to `C:\Users\user\archive\data`. The copy process will use custom parallelism (`16`), files overwrite behavior (`always`), and files remove behavior (`keep`).
   
     ```bash
-    .\imcopy.exe --source C:\Users\user\data --destination C:\Users\user\archive\data --parallel 16 --overwrite always
+    .\imcopy.exe --source C:\Users\user\data --destination C:\Users\user\archive\data --parallel 16 --overwrite always --remove keep
     ```
 
 ### Advance option
