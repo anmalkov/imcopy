@@ -35,6 +35,8 @@ public class CopyService
 
     public async Task CopyAsync(ImcopyConfiguration configuration)
     {
+        DisplayScanningForCopying();
+
         if (configuration.Parallelism.HasValue && (configuration.Parallelism.Value == 0 || configuration.Parallelism.Value == 1))
         {
             CopyDirectories(configuration.Directories, configuration.IgnorePatterns);
@@ -89,24 +91,20 @@ public class CopyService
         stopwatch.Stop();
 
         var deleteStopwatch = Stopwatch.StartNew();
-        int filesToDeleteCount = DeleteFilesInDestinationDirectories(configuration.Directories, foundFiles);
+        int filesToDeleteCount = DeleteFilesInDestinationDirectories(configuration.Directories, configuration.IgnorePatterns, foundFiles);
         deleteStopwatch.Stop();
 
         DisplaySummary(filesCount, filesCopied, stopwatch, filesToDeleteCount, deleteStopwatch);
     }
 
-    private int DeleteFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<FileItem> foundFiles)
+    private int DeleteFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns, IEnumerable<FileItem> foundFiles)
     {
         DisplayScanningForDeletion();
 
-        var filesInDestinations = GetAllFilesInDestinationDirectories(directories.Where(d => (d.RemoveBehavior ?? DefaultRemoveBehavior) == RemoveBehavior.Remove));
+        var filesInDestinations = GetAllFilesInDestinationDirectories(directories.Where(d => (d.RemoveBehavior ?? DefaultRemoveBehavior) == RemoveBehavior.Remove), ignorePatterns);
         var filesToDelete = filesInDestinations.Where(df => !foundFiles.Any(f => f.SourceFileFullName == df.SourceFileFullPath)).ToArray();
 
         var filesToDeleteCount = filesToDelete.Length;
-        if (filesToDeleteCount > 0)
-        {
-            DisplayNewLine();
-        }
 
         var filesDeleted = 0;
         foreach (var file in filesToDelete)
@@ -148,7 +146,7 @@ public class CopyService
         stopwatch.Stop();
 
         var deleteStopwatch = Stopwatch.StartNew();
-        int filesToDeleteCount = DeleteFilesInDestinationDirectories(directories, foundFiles);
+        int filesToDeleteCount = DeleteFilesInDestinationDirectories(directories, ignorePatterns, foundFiles);
         deleteStopwatch.Stop();
 
         DisplaySummary(filesCount, filesCopied, stopwatch, filesToDeleteCount, deleteStopwatch);
@@ -233,19 +231,42 @@ public class CopyService
         return files;
     }
 
-    private IEnumerable<DestinationFileItem> GetAllFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories)
+    private IEnumerable<DestinationFileItem> GetAllFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
     {
         var files = new List<DestinationFileItem>();
         foreach (var directory in directories)
         {
+            var excludeGlobs = new List<Glob>();
+            if (!string.IsNullOrEmpty(directory.IgnorePattern) && ignorePatterns is not null)
+            {
+                var ignorePattern = ignorePatterns.First(p => p.Name.Equals(directory.IgnorePattern, StringComparison.OrdinalIgnoreCase));
+                foreach (var pattern in ignorePattern.Patterns)
+                {
+                    var modifiedPattern = pattern;
+                    if (!pattern.StartsWith(Path.DirectorySeparatorChar) && !pattern.StartsWith(Path.AltDirectorySeparatorChar) && !pattern.StartsWith("**"))
+                    {
+                        modifiedPattern = $"**/{pattern}";
+                    }
+                    excludeGlobs.Add(Glob.Parse(modifiedPattern));
+                }
+            }
+
             foreach (var destination in directory.Destinations)
             {
                 var dirInfo = new DirectoryInfo(destination);
                 var fileInfos = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories);
 
                 var directoryFiles = fileInfos
-                    .Select(f =>
-                    {
+                    .Where(f => {
+                        var sourcePath = directory.Source;
+                        if (sourcePath.EndsWith(Path.DirectorySeparatorChar) || sourcePath.EndsWith(Path.AltDirectorySeparatorChar))
+                        {
+                            sourcePath = sourcePath[..^1];
+                        }
+                        var relativeFilePath = f.FullName[sourcePath.Length..];
+                        return !excludeGlobs.Any(g => g.IsMatch(relativeFilePath));
+                    })
+                    .Select(f => {
                         var relativePath = GetRelativePath(destination, f.DirectoryName);
                         var sourceFileFullName = Path.Combine(directory.Source, relativePath, f.Name);
                         return new DestinationFileItem(sourceFileFullName, f.FullName, f.DirectoryName!);
@@ -285,9 +306,14 @@ public class CopyService
         console.WriteLine($"{filesToDeleteCount} files deleted in {deleteStopwatch.Elapsed}.");
     }
 
+    private void DisplayScanningForCopying()
+    {
+        console.Write($"Scanning files for copying...");
+    }
+
     private void DisplayScanningForDeletion()
     {
-        console.Write($"{Environment.NewLine}Scanning files for deletion");
+        console.Write($"{Environment.NewLine}Scanning files for deletion...");
     }
 
     private void DisplayNewLine()
