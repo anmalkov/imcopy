@@ -258,12 +258,12 @@ public class CopyService
 
                 var directoryFiles = fileInfos
                     .Where(f => {
-                        var sourcePath = directory.Source;
-                        if (sourcePath.EndsWith(Path.DirectorySeparatorChar) || sourcePath.EndsWith(Path.AltDirectorySeparatorChar))
+                        var destinationPath = destination;
+                        if (destinationPath.EndsWith(Path.DirectorySeparatorChar) || destinationPath.EndsWith(Path.AltDirectorySeparatorChar))
                         {
-                            sourcePath = sourcePath[..^1];
+                            destinationPath = destinationPath[..^1];
                         }
-                        var relativeFilePath = f.FullName[sourcePath.Length..];
+                        var relativeFilePath = f.FullName[destinationPath.Length..];
                         return !excludeGlobs.Any(g => g.IsMatch(relativeFilePath));
                     })
                     .Select(f => {
