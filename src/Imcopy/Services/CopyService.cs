@@ -97,14 +97,23 @@ public class CopyService
 
     private int DeleteFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<FileItem> foundFiles)
     {
+        DisplayScanningForDeletion();
+
         var filesInDestinations = GetAllFilesInDestinationDirectories(directories.Where(d => (d.RemoveBehavior ?? DefaultRemoveBehavior) == RemoveBehavior.Remove));
         var filesToDelete = filesInDestinations.Where(df => !foundFiles.Any(f => f.SourceFileFullName == df.SourceFileFullPath)).ToArray();
 
         var filesToDeleteCount = filesToDelete.Length;
+        if (filesToDeleteCount > 0)
+        {
+            DisplayNewLine();
+        }
 
+        var filesDeleted = 0;
         foreach (var file in filesToDelete)
         {
             DeleteFile(file);
+            DisplayProgressBar(filesDeleted, filesToDeleteCount, deletionStep: true);
+            filesDeleted++;
         }
 
         return filesToDeleteCount;
@@ -259,13 +268,13 @@ public class CopyService
         return relativeDirectory;
     }
 
-    private void DisplayProgressBar(int currentValue, int maxValue, int barSize = 50)
+    private void DisplayProgressBar(int currentValue, int maxValue, bool deletionStep = false, int barSize = 50)
     {
         var progressFraction = (double)currentValue / maxValue;
         var filledBars = (int)(progressFraction * barSize);
         var emptyBars = barSize - filledBars;
 
-        console.Write("\r[");
+        console.Write($"\r{(deletionStep ? "Deleting" : "Copying")} [");
         console.Write(new string('#', filledBars));
         console.Write(new string(' ', emptyBars));
         console.Write($"] {progressFraction:P0}");
@@ -274,5 +283,15 @@ public class CopyService
     {
         console.WriteLine($"{Environment.NewLine}{filesCount} files processed in {stopwatch.Elapsed}. {filesCopied} files were copied.");
         console.WriteLine($"{filesToDeleteCount} files deleted in {deleteStopwatch.Elapsed}.");
+    }
+
+    private void DisplayScanningForDeletion()
+    {
+        console.Write($"{Environment.NewLine}Scanning files for deletion");
+    }
+
+    private void DisplayNewLine()
+    {
+        console.WriteLine(Environment.NewLine);
     }
 }
