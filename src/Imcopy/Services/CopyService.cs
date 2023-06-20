@@ -3,6 +3,7 @@ using System.CommandLine;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using DotNet.Globbing;
+using Imcopy.Reporters;
 
 namespace Imcopy.Services;
 
@@ -37,16 +38,17 @@ public class CopyService
     {
         DisplayScanningForCopying();
 
+        var copyReporter = new CopyReporter();
         if (configuration.Parallelism.HasValue && (configuration.Parallelism.Value == 0 || configuration.Parallelism.Value == 1))
         {
-            CopyDirectories(configuration.Directories, configuration.IgnorePatterns);
+            CopyDirectories(configuration.Directories, configuration.IgnorePatterns, configuration.Verbose, copyReporter);
             return;
         }
 
-        await CopyDirectoriesAsync(configuration);
+        await CopyDirectoriesAsync(configuration, copyReporter);
     }
 
-    private async Task CopyDirectoriesAsync(ImcopyConfiguration configuration)
+    private async Task CopyDirectoriesAsync(ImcopyConfiguration configuration, CopyReporter reporter)
     {
         var stopwatch = Stopwatch.StartNew();
 
@@ -72,7 +74,7 @@ public class CopyService
                 {
                     if (files.TryPop(out var file))
                     {
-                        var sourceFileCopiedCount = CopyFile(file);
+                        var sourceFileCopiedCount = CopyFile(file, reporter);
                         Interlocked.Add(ref filesCopied, sourceFileCopiedCount);
                         var newFilesProcessed = Interlocked.Increment(ref filesProcessed);
                         lock (lockObject)
@@ -91,13 +93,14 @@ public class CopyService
         stopwatch.Stop();
 
         var deleteStopwatch = Stopwatch.StartNew();
-        int filesToDeleteCount = DeleteFilesInDestinationDirectories(configuration.Directories, configuration.IgnorePatterns, foundFiles);
+        int filesToDeleteCount = DeleteFilesInDestinationDirectories(configuration.Directories, configuration.IgnorePatterns, foundFiles, reporter);
         deleteStopwatch.Stop();
 
-        DisplaySummary(filesCount, filesCopied, stopwatch, filesToDeleteCount, deleteStopwatch);
+        DisplaySummary(filesCount, filesCopied, stopwatch, filesToDeleteCount, deleteStopwatch, configuration.Verbose, reporter);
     }
 
-    private int DeleteFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns, IEnumerable<FileItem> foundFiles)
+    private int DeleteFilesInDestinationDirectories(IEnumerable<DirectoryConfiguration> directories,
+        IEnumerable<IgnorePatternConfiguration>? ignorePatterns, IEnumerable<FileItem> foundFiles, CopyReporter reporter)
     {
         DisplayScanningForDeletion();
 
@@ -109,7 +112,7 @@ public class CopyService
         var filesDeleted = 0;
         foreach (var file in filesToDelete)
         {
-            DeleteFile(file);
+            DeleteFile(file, reporter);
             DisplayProgressBar(filesDeleted, filesToDeleteCount, deletionStep: true);
             filesDeleted++;
         }
@@ -117,17 +120,20 @@ public class CopyService
         return filesToDeleteCount;
     }
 
-    private static void DeleteFile(DestinationFileItem file)
+    private static void DeleteFile(DestinationFileItem file, CopyReporter reporter)
     {
         File.Delete(file.DestinationFileFullName);
+        reporter.ReportFileProcessed(file.DestinationFileFullName, file.DestinationFileFullName, CopyState.Deleted);
         var dirInfo = new DirectoryInfo(file.DestinationDirectoryName);
         if (dirInfo.GetFiles().Length == 0 && dirInfo.GetDirectories().Length == 0)
         {
             Directory.Delete(file.DestinationDirectoryName);
+            reporter.ReportFileProcessed(file.DestinationDirectoryName, file.DestinationDirectoryName, CopyState.Deleted);
         }
     }
 
-    private void CopyDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns)
+    private void CopyDirectories(IEnumerable<DirectoryConfiguration> directories, IEnumerable<IgnorePatternConfiguration>? ignorePatterns,
+        bool? verbose, CopyReporter reporter)
     {
         var stopwatch = Stopwatch.StartNew();
 
@@ -139,20 +145,20 @@ public class CopyService
 
         foreach (var file in foundFiles)
         {
-            filesCopied += CopyFile(file);
+            filesCopied += CopyFile(file, reporter);
             filesProcessed++;
             DisplayProgressBar(filesProcessed, filesCount);
         }
         stopwatch.Stop();
 
         var deleteStopwatch = Stopwatch.StartNew();
-        int filesToDeleteCount = DeleteFilesInDestinationDirectories(directories, ignorePatterns, foundFiles);
+        int filesToDeleteCount = DeleteFilesInDestinationDirectories(directories, ignorePatterns, foundFiles, reporter);
         deleteStopwatch.Stop();
 
-        DisplaySummary(filesCount, filesCopied, stopwatch, filesToDeleteCount, deleteStopwatch);
+        DisplaySummary(filesCount, filesCopied, stopwatch, filesToDeleteCount, deleteStopwatch, verbose, reporter);
     }
 
-    private static int CopyFile(FileItem file)
+    private static int CopyFile(FileItem file, CopyReporter reporter)
     {
         var copiedFiles = 0;
         foreach (var destinationDirectory in file.DestinationDirectories)
@@ -167,6 +173,7 @@ public class CopyService
             {
                 if (overwriteBehavior == OverwriteBehavior.Never)
                 {
+                    reporter.ReportFileProcessed(file.SourceFileFullName, destinationFile, CopyState.Ignored);
                     continue;
                 }
 
@@ -174,10 +181,12 @@ public class CopyService
                 var destinationFileInfo = new FileInfo(destinationFile);
                 if (sourceFileInfo.LastWriteTimeUtc <= destinationFileInfo.LastWriteTimeUtc)
                 {
+                    reporter.ReportFileProcessed(file.SourceFileFullName, destinationFile, CopyState.Ignored);
                     continue;
                 }
             }
             File.Copy(file.SourceFileFullName, destinationFile, overwrite: true);
+            reporter.ReportFileProcessed(file.SourceFileFullName, destinationFile, CopyState.Copied);
             copiedFiles++;
         }
         return copiedFiles;
@@ -300,10 +309,45 @@ public class CopyService
         console.Write(new string(' ', emptyBars));
         console.Write($"] {progressFraction:P0}");
     }
-    private void DisplaySummary(int filesCount, int filesCopied, Stopwatch stopwatch, int filesToDeleteCount, Stopwatch deleteStopwatch)
+    private void DisplaySummary(int filesCount, int filesCopied, Stopwatch stopwatch, int filesToDeleteCount, Stopwatch deleteStopwatch,
+        bool? verbose, CopyReporter reporter)
     {
         console.WriteLine($"{Environment.NewLine}{filesCount} files processed in {stopwatch.Elapsed}. {filesCopied} files were copied.");
+        DisplayCopiedFilesDetails(verbose, reporter);
         console.WriteLine($"{filesToDeleteCount} files deleted in {deleteStopwatch.Elapsed}.");
+        DisplayDeletedFilesDetails(verbose, reporter);
+    }
+
+    private void DisplayCopiedFilesDetails(bool? verbose, CopyReporter reporter)
+    {
+        if (!verbose.HasValue || !verbose.Value)
+        {
+            return;
+        }
+
+        foreach (var copiedFile in reporter.GetProcessedFile(CopyState.Copied))
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            console.WriteLine($"    {copiedFile.Key}");
+            Console.ResetColor();
+            foreach (var destination in copiedFile.Value)
+            {
+                console.WriteLine($"    --> {destination}");
+            }
+        }
+    }
+
+    private void DisplayDeletedFilesDetails(bool? verbose, CopyReporter reporter)
+    {
+        if (!verbose.HasValue || !verbose.Value)
+        {
+            return;
+        }
+
+        foreach (var deletedFile in reporter.GetProcessedFile(CopyState.Deleted))
+        {
+            console.WriteLine($"    {deletedFile.Key}");
+        }
     }
 
     private void DisplayScanningForCopying()

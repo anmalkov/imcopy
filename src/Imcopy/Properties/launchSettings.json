@@ -2,7 +2,7 @@
   "profiles": {
     "Imcopy": {
       "commandName": "Project",
-      "commandLineArgs": "--file imcopy.yaml"
+      "commandLineArgs": "--file D:\\Apps\\My\\to-vdi.yaml"
     }
   }
 }
