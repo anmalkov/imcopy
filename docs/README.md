@@ -20,6 +20,7 @@ Parameters:
 - `--remove` or `-r`: Files remove behavior. If option is not specified, the default value (`remove`) will be used. Possible values:
   - `keep`: Keep extra files in the destination directory that do NOT exist in the source directory.
   - `remove`: Remove extra files in the destination directory that do NOT exist in the source directory.
+- `--verbose` or `-v`: Show details about the copy process.
 
 #### Examples
 
@@ -27,7 +28,7 @@ Parameters:
   This command will copy all files from `/home/user/data` to `/home/user/archive/data`. The copy process will use default parallelism (`8`), default files overwrite behavior (`ifNewer`), and default files remove behavior (`remove`).
   
     ```bash
-    imcopy --source /home/user/data --destination /home/user/archive/data
+    imcopy --source /home/user/data --destination /home/user/archive/data --verbose
     ```
 
 2. Simple Windows command  
