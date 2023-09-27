@@ -13,7 +13,7 @@ var parallelOption = new Option<int?>(new[] { "--parallel", "-p" }, () => CopySe
 var overwriteBehaviorOption = new Option<OverwriteBehavior?>(new[] { "--overwrite", "-o" }, () => OverwriteBehavior.IfNewer, $"Overwrite behavior:\n- always:  Overwrite all the files in the destination directory.\n- ifNewer: Overwrite a file in the destination directory only if a file in the source directory is newer.\n- never:   Do not copy a file if it already exists in the destination directory.\nIf option is not specified, the default value will be used.");
 var removeBehaviorOption = new Option<RemoveBehavior?>(new[] { "--remove", "-r" }, () => RemoveBehavior.Remove, $"Remove behavior:\n- remove: Remove extra files in the destination directory that do NOT exist in the source directory\n- keep:  Keep extra files in the destination directory that do NOT exist in the source directory.\nIf option is not specified, the default value will be used.");
 var verboseOption = new Option<bool?>(new[] { "--verbose", "-v" }, () => false, $"Show details about the copy process.");
-var dryRunOption = new Option<bool?>(new[] { "--dryRun" }, () => false, $"Won't copy or delete files. Just show details.");
+var dryRunOption = new Option<bool?>(new[] { "--dry-run" }, () => false, $"Do NOT copy or delete files. Just show details what will be copied and deleted.");
 
 var rootCommand = new RootCommand("A powerful and efficient CLI tool designed to simplify the process of copying and synchronizing files between directories")
 {
