@@ -13,6 +13,7 @@ var parallelOption = new Option<int?>(new[] { "--parallel", "-p" }, () => CopySe
 var overwriteBehaviorOption = new Option<OverwriteBehavior?>(new[] { "--overwrite", "-o" }, () => OverwriteBehavior.IfNewer, $"Overwrite behavior:\n- always:  Overwrite all the files in the destination directory.\n- ifNewer: Overwrite a file in the destination directory only if a file in the source directory is newer.\n- never:   Do not copy a file if it already exists in the destination directory.\nIf option is not specified, the default value will be used.");
 var removeBehaviorOption = new Option<RemoveBehavior?>(new[] { "--remove", "-r" }, () => RemoveBehavior.Remove, $"Remove behavior:\n- remove: Remove extra files in the destination directory that do NOT exist in the source directory\n- keep:  Keep extra files in the destination directory that do NOT exist in the source directory.\nIf option is not specified, the default value will be used.");
 var verboseOption = new Option<bool?>(new[] { "--verbose", "-v" }, () => false, $"Show details about the copy process.");
+var dryRunOption = new Option<bool?>(new[] { "--dryRun" }, () => false, $"Won't copy or delete files. Just show details.");
 
 var rootCommand = new RootCommand("A powerful and efficient CLI tool designed to simplify the process of copying and synchronizing files between directories")
 {
@@ -22,7 +23,8 @@ var rootCommand = new RootCommand("A powerful and efficient CLI tool designed to
     parallelOption,
     overwriteBehaviorOption,
     removeBehaviorOption,
-    verboseOption
+    verboseOption,
+    dryRunOption
 };
 
 rootCommand.SetHandler(async context =>
@@ -34,6 +36,7 @@ rootCommand.SetHandler(async context =>
     var overwriteBehavior = context.ParseResult.GetValueForOption(overwriteBehaviorOption);
     var removeBehavior = context.ParseResult.GetValueForOption(removeBehaviorOption);
     var verbose = context.ParseResult.GetValueForOption(verboseOption);
+    var dryRun = context.ParseResult.GetValueForOption(dryRunOption);
 
     var parametersAreValid = ValidateParameters(configFile, source, destination, context.Console);
     if (!parametersAreValid)
@@ -57,7 +60,8 @@ rootCommand.SetHandler(async context =>
             }},
             IgnorePatterns = null,
             Parallelism = parallel,
-            Verbose = verbose
+            Verbose = verbose,
+            DryRun = dryRun
         };
     }
     else
@@ -70,6 +74,7 @@ rootCommand.SetHandler(async context =>
             return;
         }
         configuration = loadResult.Configuration!;
+        configuration.DryRun = dryRun;
     }
 
     await copyService.CopyAsync(configuration);

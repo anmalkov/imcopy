@@ -6,4 +6,5 @@ public class ImcopyConfiguration
     public IEnumerable<IgnorePatternConfiguration>? IgnorePatterns { get; set; }
     public int? Parallelism { get; set; }
     public bool? Verbose { get; set; }
+    public bool? DryRun { get; set; }
 }
