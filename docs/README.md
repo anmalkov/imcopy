@@ -21,6 +21,7 @@ Parameters:
   - `keep`: Keep extra files in the destination directory that do NOT exist in the source directory.
   - `remove`: Remove extra files in the destination directory that do NOT exist in the source directory.
 - `--verbose` or `-v`: Show details about the copy process.
+- `--dry-run`: Do NOT copy or delete files. Just show details what will be copied and deleted. If option is not specified, the default value (`False`) will be used.
 
 #### Examples
 
@@ -36,6 +37,13 @@ Parameters:
   
     ```bash
     .\imcopy.exe --source C:\Users\user\data --destination C:\Users\user\archive\data --parallel 16 --overwrite always --remove keep
+    ```
+
+3. Simple dry-run commnand
+  This command will just print out what files will be copied and deleted if you ecexute `imcopy` command to copy files from `/home/user/data` to `/home/user/archive/data`. Nothing will be copied or deleted.
+
+    ```bash
+    imcopy --source /home/user/data --destination /home/user/archive/data --dry-run
     ```
 
 ### Advance option
